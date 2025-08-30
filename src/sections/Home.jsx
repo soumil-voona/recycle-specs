@@ -15,7 +15,7 @@ const Home = () => {
       <div className="rounded-box">
         <BlurText
           text="RECYCLE SPECS"
-          delay={150}
+          delay={75}
           animateBy="characters"
           direction="bottom"
           onAnimationComplete={handleAnimationComplete}

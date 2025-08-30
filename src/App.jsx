@@ -76,7 +76,7 @@ const AnimatedSection = ({ children, variants = sectionVariants, className = "",
   const ref = useRef(null)
   const [hasAnimated, setHasAnimated] = useState(false)
   const isInView = useInView(ref, { 
-    once: false,
+    once: true,
     amount: 0.2, // Reduced from 0.3 for earlier trigger
     margin: "0px 0px -50px 0px" // Less aggressive margin
   })

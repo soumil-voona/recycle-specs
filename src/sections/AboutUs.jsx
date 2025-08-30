@@ -38,7 +38,7 @@ const AboutUs = () => {
       </div>
 
       <div className="content-wrapper">
-        <div className="section-title" style={{textAlign: 'center', fontSize: '6rem'}}>
+        <div className="section-title" style={{textAlign: 'center', fontSize: 'clamp(3rem, 8vw, 6rem)'}}>
             About Us
         </div>
         {sections.map((section, index) => (

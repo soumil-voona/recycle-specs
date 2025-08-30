@@ -534,7 +534,7 @@ const Partnerships = () => {
       </div>
 
       <div className="partnerships-header">
-        <h2 className="section-title" style={{fontSize: '6rem'}}>Our Partnerships</h2>
+        <h2 className="section-title" style={{fontSize: 'clamp(3rem, 8vw, 6rem)'}}>Our Partnerships</h2>
         <p className="section-subtitle">
           Collaborating with amazing organizations to amplify our impact and reach more communities in need
         </p>

@@ -507,7 +507,7 @@ const BoardMembers = () => {
   return (
     <div className="profile-showcase">
       <div className="showcase-header">
-        <h2 style={{fontSize: '6rem'}}>Meet Our Team</h2>
+        <h2 style={{fontSize: 'clamp(3rem, 8vw, 6rem)'}}>Meet Our Team</h2>
         <p>Dedicated individuals working together to bring fair optical care services worldwide</p>
       </div>
       
