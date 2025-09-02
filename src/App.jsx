@@ -35,11 +35,12 @@ const sectionVariants = {
   }
 }
 
+// Fixed: Reduced animation values to prevent overflow
 const alternateVariants = {
   hidden: { 
     opacity: 0,
-    x: -100,
-    rotateY: -15
+    x: -50, // Reduced from -100
+    rotateY: -5  // Reduced from -15
   },
   visible: { 
     opacity: 1,
@@ -53,11 +54,12 @@ const alternateVariants = {
   }
 }
 
+// Fixed: Reduced animation values to prevent overflow
 const slideFromRightVariants = {
   hidden: { 
     opacity: 0,
-    x: 100,
-    scale: 0.9
+    x: 50, // Reduced from 100
+    scale: 0.95 // Increased from 0.9
   },
   visible: { 
     opacity: 1,
@@ -107,6 +109,10 @@ const AnimatedSection = ({ children, variants = sectionVariants, className = "",
       initial="hidden"
       animate={shouldAnimate || hasAnimated ? "visible" : "hidden"}
       style={{
+        // Fixed: Ensure container doesn't overflow
+        overflow: 'hidden',
+        position: 'relative',
+        width: '100%',
         transformStyle: 'preserve-3d',
         backfaceVisibility: 'hidden'
       }}
@@ -124,6 +130,11 @@ const HomeSection = ({ children }) => {
       initial={{ opacity: 0, scale: 1.1 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 1.2, ease: 'easeOut' }}
+      style={{
+        // Fixed: Ensure home section doesn't overflow
+        overflow: 'hidden',
+        width: '100%'
+      }}
     >
       {children}
     </motion.div>
@@ -135,9 +146,14 @@ function App() {
     <>
       <Navbar />
       
-      {/* Global page transition wrapper */}
+      {/* Global page transition wrapper - Fixed: Added overflow control */}
       <motion.div 
-        style={{ paddingTop: "70px" }}
+        style={{ 
+          paddingTop: "70px",
+          overflow: 'hidden', // Prevent horizontal scroll
+          width: '100%',
+          position: 'relative'
+        }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
@@ -194,7 +210,10 @@ function App() {
               background: 'linear-gradient(135deg, rgba(45, 125, 125, 0.1), rgba(196, 93, 7, 0.1))',
               margin: '4rem 0',
               borderRadius: '2rem',
-              backdropFilter: 'blur(10px)'
+              backdropFilter: 'blur(10px)',
+              // Fixed: Ensure contact section stays within bounds
+              width: '100%',
+              overflow: 'hidden'
             }}
           >
             <motion.div
@@ -209,7 +228,8 @@ function App() {
               style={{
                 textAlign: 'center',
                 padding: '3rem',
-                color: '#2d2d2d'
+                color: '#2d2d2d',
+                maxWidth: '100%' // Fixed: Prevent content from overflowing
               }}
             >
               <h2 style={{
@@ -236,16 +256,31 @@ function App() {
         </AnimatedSection>
       </motion.div>
 
-      {/* Page-level background animations */}
+      {/* Page-level background animations - Fixed: Enhanced overflow prevention */}
       <style jsx global>{`
         /* Smooth scrolling for the entire page */
         html {
           scroll-behavior: smooth;
+          overflow-x: hidden; /* CRITICAL: Prevent horizontal scrolling globally */
         }
         
         /* Ensure sections have proper spacing for animations */
         body {
           overflow-x: hidden; /* Prevent horizontal scrolling from animations */
+          margin: 0;
+          padding: 0;
+          width: 100%;
+        }
+        
+        /* Fix for responsive containers */
+        *, *::before, *::after {
+          box-sizing: border-box; /* Ensure padding doesn't cause overflow */
+        }
+        
+        /* Container queries for better responsive behavior */
+        .container, .section {
+          max-width: 100%;
+          overflow-x: hidden;
         }
         
         /* Add subtle entrance animation to page elements */
@@ -263,8 +298,33 @@ function App() {
           background: #f1f1f1;
           border-radius: 4px;
         }
+        
+        ::-webkit-scrollbar-thumb {
+          background: linear-gradient(135deg, #c65d07, #e6b800);
+          border-radius: 4px;
+        }
+        
         ::-webkit-scrollbar-thumb:hover {
           background: linear-gradient(135deg, #e67309, #ffcc00);
+        }
+
+        /* Enhance focus states for accessibility */
+        *:focus-visible {
+          outline: 2px solid #c65d07;
+          outline-offset: 2px;
+        }
+        
+        /* Media query for tablet/intermediate sizes where issues commonly occur */
+        @media (min-width: 768px) and (max-width: 1024px) {
+          body {
+            overflow-x: hidden !important;
+          }
+          
+          /* Ensure all animated sections stay within bounds */
+          [data-framer-component] {
+            max-width: 100% !important;
+            overflow: hidden !important;
+          }
         }
       `}</style>
     </>
