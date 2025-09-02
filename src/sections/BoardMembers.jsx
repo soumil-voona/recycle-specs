@@ -219,14 +219,17 @@ const ProfileCard = ({
           height: 120px;
           border-radius: 50%;
           overflow: hidden;
-          background: linear-gradient(135deg, var(--profile-color), #e6b800);
-          padding: 4px;
+          // background: linear-gradient(135deg, var(--profile-color), #e6b800);
+          /* Remove padding to eliminate white border */
+          padding: 0;
           transition: all 0.4s ease;
+          background: transparent;
         }
 
         .profile-card.hovered .image-frame {
           transform: scale(1.1) rotate(5deg);
           box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+          background: transparent;
         }
 
         .profile-image {
@@ -234,7 +237,7 @@ const ProfileCard = ({
           height: 100%;
           object-fit: cover;
           border-radius: 50%;
-          background: white;
+          background: transparent;
           transition: all 0.4s ease;
         }
 

@@ -229,7 +229,7 @@ function App() {
                 Ready to make a difference? Get in touch with our team to learn more about RecycleSpecs and how you can help bring optical care to communities in need.
                 <br />
                 <br />
-                Email us at <br /><a href="mailto:recycle-specs@gmail.com" style={{ color: '#c65d07' }}>recycle-specs@gmail.com</a>
+                Email us at <br /><a href="mailto:recyclespecs@gmail.com" style={{ color: '#c65d07' }}>recyclespecs@gmail.com</a>
               </p>
             </motion.div>
           </motion.div>

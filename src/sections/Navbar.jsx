@@ -90,7 +90,11 @@ const Navbar = () => {
         </div>
 
         {/* Mobile Menu Button */}
-        <div className="mobile-menu-btn" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+        <div className="mobile-menu-btn" onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setMobileMenuOpen(!mobileMenuOpen);
+        }}>
           <div className={`hamburger ${mobileMenuOpen ? 'open' : ''}`}>
             <span className="line line-1"></span>
             <span className="line line-2"></span>
@@ -130,7 +134,7 @@ const Navbar = () => {
 
         {/* CTA Button */}
         <div className="cta-section">
-          <button className="donate-btn">
+          <button className="donate-btn" onClick={() => handleNavigation("contact")}>
             <span>Donate Now</span>
             <div className="btn-stripes">
               <div className="btn-stripe"></div>
@@ -149,6 +153,15 @@ const Navbar = () => {
       </div>
 
       <style jsx>{`
+        * {
+          box-sizing: border-box;
+        }
+        
+        html, body {
+          overflow-x: hidden;
+          max-width: 100vw;
+        }
+        
         .navbar-wrapper {
           position: fixed;
           top: 0;
@@ -403,6 +416,7 @@ const Navbar = () => {
           display: flex;
           flex-direction: column;
           justify-content: space-between;
+          transform: translateZ(0);
         }
 
         .line {
@@ -410,21 +424,34 @@ const Navbar = () => {
           height: 2px;
           background: linear-gradient(90deg, #c65d07, #e6b800);
           border-radius: 2px;
-          transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+          transition: none;
           transform-origin: center;
+          position: relative;
+        }
+
+        .line-1 {
+          transition: transform 0.2s ease-in-out;
+        }
+
+        .line-2 {
+          transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+        }
+
+        .line-3 {
+          transition: transform 0.2s ease-in-out;
         }
 
         .hamburger.open .line-1 {
-          transform: translateY(8px) rotate(45deg);
+          transform: translate3d(0, 8px, 0) rotate(45deg);
         }
 
         .hamburger.open .line-2 {
           opacity: 0;
-          transform: scaleX(0);
+          transform: translate3d(0, 0, 0) scaleX(0);
         }
 
         .hamburger.open .line-3 {
-          transform: translateY(-8px) rotate(-45deg);
+          transform: translate3d(0, -8px, 0) rotate(-45deg);
         }
 
         /* Mobile Menu Overlay */
@@ -440,6 +467,7 @@ const Navbar = () => {
           opacity: 0;
           visibility: hidden;
           transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+          overflow: hidden;
         }
 
         .mobile-menu-overlay.open {
@@ -450,12 +478,17 @@ const Navbar = () => {
         .mobile-menu-content {
           position: relative;
           height: 100%;
+          width: 100%;
+          max-width: 100vw;
           display: flex;
           flex-direction: column;
           justify-content: center;
           align-items: center;
           gap: 2rem;
           z-index: 13;
+          overflow: hidden;
+          box-sizing: border-box;
+          padding: 0 1rem;
         }
 
         .mobile-nav-item {
@@ -469,7 +502,8 @@ const Navbar = () => {
           text-align: center;
           border-radius: 16px;
           overflow: hidden;
-          transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+          transition: all 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+          transition-delay: var(--item-delay);
           transform: translateY(50px);
           opacity: 0;
         }
@@ -477,19 +511,6 @@ const Navbar = () => {
         .mobile-menu-overlay.open .mobile-nav-item {
           transform: translateY(0);
           opacity: 1;
-          animation: slideInMobile 0.6s ease forwards;
-          animation-delay: var(--item-delay);
-        }
-
-        @keyframes slideInMobile {
-          from {
-            transform: translateY(50px);
-            opacity: 0;
-          }
-          to {
-            transform: translateY(0);
-            opacity: 1;
-          }
         }
 
         .mobile-nav-item:hover {
@@ -517,6 +538,8 @@ const Navbar = () => {
 
         .mobile-cta {
           margin-top: 2rem;
+          transition: all 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+          transition-delay: 0.4s;
           transform: translateY(50px);
           opacity: 0;
         }
@@ -524,8 +547,6 @@ const Navbar = () => {
         .mobile-menu-overlay.open .mobile-cta {
           transform: translateY(0);
           opacity: 1;
-          animation: slideInMobile 0.6s ease forwards;
-          animation-delay: 0.4s;
         }
 
         .mobile-donate-btn {
@@ -553,6 +574,7 @@ const Navbar = () => {
           inset: 0;
           overflow: hidden;
           z-index: 1;
+          max-width: 100vw;
         }
 
         .mobile-bg-stripe {
@@ -561,6 +583,8 @@ const Navbar = () => {
           height: 4px;
           left: -50%;
           opacity: 0.2;
+          max-width: 200vw;
+          will-change: transform;
         }
 
         .mobile-bg-stripe:nth-child(1) {
