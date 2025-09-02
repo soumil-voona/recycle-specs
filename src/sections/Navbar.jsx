@@ -17,7 +17,8 @@ const Navbar = () => {
     { name: 'Home', color: '#2d7d7d', angle: '45deg' },
     { name: 'About', color: '#c65d07', angle: '135deg' },
     { name: 'Board', color: '#e6b800', angle: '-135deg' },
-    { name: 'Partnerships', color: '#4a4a4a', angle: '-45deg' }
+    { name: 'Events', color: '#5b8b5b', angle: '-45deg' },
+    { name: 'Partnerships', color: '#4a4a4a', angle: '45deg' }
   ];
 
   const handleNavigation = (itemName) => {
