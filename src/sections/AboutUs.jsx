@@ -26,6 +26,79 @@ const AboutUs = () => {
     }
   ];
 
+  const SectionCard = ({ section, index }) => {
+    const [sectionVisible, setSectionVisible] = useState(false);
+    const ref = React.useRef(null);
+
+    React.useEffect(() => {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting && !sectionVisible) {
+            setTimeout(() => {
+              setSectionVisible(true);
+            }, index * 150);
+          }
+        },
+        { 
+          threshold: 0.2,
+          rootMargin: "-50px 0px -50px 0px"
+        }
+      );
+
+      if (ref.current) {
+        observer.observe(ref.current);
+      }
+
+      return () => {
+        if (ref.current) {
+          observer.unobserve(ref.current);
+        }
+      };
+    }, [index, sectionVisible]);
+
+    return (
+      <div
+        ref={ref}
+        className={`section-card ${hoveredSection === index ? 'hovered' : ''} ${sectionVisible ? 'section-visible' : ''}`}
+        onMouseEnter={() => setHoveredSection(index)}
+        onMouseLeave={() => setHoveredSection(null)}
+        style={{
+          '--section-color': section.color,
+          '--stripe-angle': section.stripeAngle,
+        }}
+      >
+        {/* Card background stripes */}
+        <div className="card-bg-stripes">
+          <div className="card-bg-stripe stripe-1"></div>
+          <div className="card-bg-stripe stripe-2"></div>
+          <div className="card-bg-stripe stripe-3"></div>
+        </div>
+
+        {/* Section header */}
+        <div className="section-header">
+          <h2 className="section-title">{section.title}</h2>
+          <div className="title-underline"></div>
+        </div>
+
+        {/* Section content */}
+        <div className="section-content">
+          <p className="section-text">{section.content}</p>
+        </div>
+
+        {/* Decorative elements */}
+        <div className="diagonal-accent"></div>
+        <div className="hover-glow"></div>
+        
+        {/* Interactive stripes */}
+        <div className="interactive-stripes">
+          <div className="interactive-stripe stripe-i-1"></div>
+          <div className="interactive-stripe stripe-i-2"></div>
+          <div className="interactive-stripe stripe-i-3"></div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className={`about-us-container ${isVisible ? 'visible' : ''}`}>
       {/* Background diagonal stripes */}
@@ -42,46 +115,11 @@ const AboutUs = () => {
             About Us
         </div>
         {sections.map((section, index) => (
-          <div
+          <SectionCard 
             key={section.id}
-            className={`section-card ${hoveredSection === index ? 'hovered' : ''}`}
-            onMouseEnter={() => setHoveredSection(index)}
-            onMouseLeave={() => setHoveredSection(null)}
-            style={{
-              '--section-color': section.color,
-              '--stripe-angle': section.stripeAngle,
-              '--animation-delay': `${index * 0.3}s`
-            }}
-          >
-            {/* Card background stripes */}
-            <div className="card-bg-stripes">
-              <div className="card-bg-stripe stripe-1"></div>
-              <div className="card-bg-stripe stripe-2"></div>
-              <div className="card-bg-stripe stripe-3"></div>
-            </div>
-
-            {/* Section header */}
-            <div className="section-header">
-              <h2 className="section-title">{section.title}</h2>
-              <div className="title-underline"></div>
-            </div>
-
-            {/* Section content */}
-            <div className="section-content">
-              <p className="section-text">{section.content}</p>
-            </div>
-
-            {/* Decorative elements */}
-            <div className="diagonal-accent"></div>
-            <div className="hover-glow"></div>
-            
-            {/* Interactive stripes */}
-            <div className="interactive-stripes">
-              <div className="interactive-stripe stripe-i-1"></div>
-              <div className="interactive-stripe stripe-i-2"></div>
-              <div className="interactive-stripe stripe-i-3"></div>
-            </div>
-          </div>
+            section={section}
+            index={index}
+          />
         ))}
       </div>
 
@@ -188,19 +226,19 @@ const AboutUs = () => {
           overflow: hidden;
           border: 1px solid rgba(255, 255, 255, 0.3);
           box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-          transition: all 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+          transition: all 0.8s cubic-bezier(0.25, 0.25, 0.25, 1);
           cursor: pointer;
+          
+          /* Initial state - hidden */
           opacity: 0;
-          transform: translateY(30px);
-          animation: slideInUp 0.8s ease forwards;
-          animation-delay: var(--animation-delay);
+          transform: translateY(50px) scale(0.9);
+          filter: blur(8px);
         }
 
-        @keyframes slideInUp {
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+        .section-card.section-visible {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+          filter: blur(0px);
         }
 
         .section-card.hovered {
@@ -208,6 +246,10 @@ const AboutUs = () => {
           box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
           background: rgba(255, 255, 255, 0.95);
           border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .section-card.section-visible.hovered {
+          transform: translateY(-8px) scale(1.02);
         }
 
         .card-bg-stripes {

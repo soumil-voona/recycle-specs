@@ -11,16 +11,45 @@ const PartnerCard = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  
+  const ref = React.useRef(null);
+
+  React.useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !isVisible) {
+          setTimeout(() => {
+            setIsVisible(true);
+          }, index * 150);
+        }
+      },
+      { 
+        threshold: 0.2,
+        rootMargin: "-50px 0px -50px 0px"
+      }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => {
+      if (ref.current) {
+        observer.unobserve(ref.current);
+      }
+    };
+  }, [index, isVisible]);
 
   return (
     <div
-      className={`partner-card ${isHovered ? 'hovered' : ''}`}
+      ref={ref}
+      className={`partner-card ${isHovered ? 'hovered' : ''} ${isVisible ? 'visible' : ''}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       style={{
         '--partner-color': color,
         '--stripe-angle': stripeAngle,
-        '--animation-delay': `${index * 0.2}s`
       }}
     >
       {/* Background diagonal stripes */}
@@ -116,19 +145,19 @@ const PartnerCard = ({
           overflow: hidden;
           border: 1px solid rgba(255, 255, 255, 0.3);
           box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-          transition: all 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
           cursor: pointer;
+          
+          /* Initial state - hidden */
           opacity: 0;
-          transform: translateY(50px);
-          animation: fadeInUp 0.8s ease forwards;
-          animation-delay: var(--animation-delay);
+          transform: translateY(50px) scale(0.9);
+          filter: blur(8px);
+          transition: all 0.8s cubic-bezier(0.25, 0.25, 0.25, 1);
         }
 
-        @keyframes fadeInUp {
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+        .partner-card.visible {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+          filter: blur(0px);
         }
 
         .partner-card.hovered {
@@ -136,6 +165,10 @@ const PartnerCard = ({
           box-shadow: 0 24px 80px rgba(0, 0, 0, 0.2);
           background: rgba(255, 255, 255, 0.95);
           border: 1px solid var(--partner-color);
+        }
+
+        .partner-card.visible.hovered {
+          transform: translateY(-12px) scale(1.03);
         }
 
         .partner-bg-stripes {
@@ -184,6 +217,15 @@ const PartnerCard = ({
           position: relative;
           margin-bottom: 2rem;
           z-index: 5;
+          opacity: 0;
+          transform: scale(0.8);
+          transition: all 0.6s ease;
+          transition-delay: 0.3s;
+        }
+
+        .partner-card.visible .logo-container {
+          opacity: 1;
+          transform: scale(1);
         }
 
         .logo-frame {
@@ -298,6 +340,15 @@ const PartnerCard = ({
           display: flex;
           flex-direction: column;
           justify-content: space-between;
+          opacity: 0;
+          transform: translateY(20px);
+          transition: all 0.7s ease;
+          transition-delay: 0.5s;
+        }
+
+        .partner-card.visible .partner-content {
+          opacity: 1;
+          transform: translateY(0);
         }
 
         .name-section {
@@ -496,16 +547,39 @@ const PartnerCard = ({
 
 const Partnerships = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const [headerVisible, setHeaderVisible] = useState(false);
+  const headerRef = React.useRef(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 100);
     return () => clearTimeout(timer);
   }, []);
 
+  React.useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setHeaderVisible(true);
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    if (headerRef.current) {
+      observer.observe(headerRef.current);
+    }
+
+    return () => {
+      if (headerRef.current) {
+        observer.unobserve(headerRef.current);
+      }
+    };
+  }, []);
+
   // Example partnerships - replace with your actual data
   const partnerships = [
     {
-      logo: "/imgs/partnership_sankara-eye-care.png", // Fixed path consistency
+      logo: "/imgs/partnership_sankara-eye-care.png",
       name: "Sankara Eye Care Institutions",
       description: "An organization aiming to treat preventable and treatable blindness",
       website: "https://sankaraeye.com",
@@ -533,7 +607,10 @@ const Partnerships = () => {
         <div className="bg-stripe bg-stripe-5"></div>
       </div>
 
-      <div className="partnerships-header">
+      <div 
+        ref={headerRef}
+        className={`partnerships-header ${headerVisible ? 'header-visible' : ''}`}
+      >
         <h2 className="section-title" style={{fontSize: 'clamp(3rem, 8vw, 6rem)'}}>Our Partnerships</h2>
         <p className="section-subtitle">
           Collaborating with amazing organizations to amplify our impact and reach more communities in need
@@ -641,20 +718,25 @@ const Partnerships = () => {
           z-index: 10;
           text-align: center;
           margin-bottom: 4rem;
+          opacity: 0;
+          transform: translateY(-30px);
+          filter: blur(6px);
+          transition: all 1s cubic-bezier(0.25, 0.25, 0.25, 1);
+        }
+
+        .partnerships-header.header-visible {
+          opacity: 1;
+          transform: translateY(0);
+          filter: blur(0px);
         }
 
         .section-title {
           font-family: 'DM Serif Text', Times, serif;
-          font-size: clamp(2.2rem, 4.5vw, 3rem);
           color: #2d2d2d;
           margin: 0 0 1rem 0;
           font-weight: 700;
           letter-spacing: -0.5px;
           text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.05);
-          opacity: 0;
-          transform: translateY(20px);
-          animation: slideInUp 0.8s ease forwards;
-          animation-delay: 0.2s;
         }
 
         .section-subtitle {
@@ -665,9 +747,11 @@ const Partnerships = () => {
           margin: 0 auto 2rem auto;
           line-height: 1.6;
           opacity: 0;
-          transform: translateY(20px);
-          animation: slideInUp 0.8s ease forwards;
-          animation-delay: 0.4s;
+          transition: opacity 0.8s ease 0.3s;
+        }
+
+        .partnerships-header.header-visible .section-subtitle {
+          opacity: 1;
         }
 
         .header-underline {
@@ -676,21 +760,11 @@ const Partnerships = () => {
           background: linear-gradient(90deg, #c65d07, #e6b800, #2d7d7d);
           margin: 0 auto;
           border-radius: 2px;
-          animation: expandLine 1s ease forwards;
-          animation-delay: 0.6s;
+          transition: width 1s ease 0.6s;
         }
 
-        @keyframes slideInUp {
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes expandLine {
-          to {
-            width: 120px;
-          }
+        .partnerships-header.header-visible .header-underline {
+          width: 120px;
         }
 
         .partnerships-grid {

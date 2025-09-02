@@ -26,11 +26,13 @@ const Navbar = () => {
     if (element) {
       // Dynamic navbar height detection
       const navbar = document.querySelector('.navbar-wrapper');
-      const navbarHeight = navbar ? navbar.offsetHeight : 75;
-      
+      // Use smaller offset on mobile
+      const isMobile = window.innerWidth <= 900;
+      const navbarHeight = navbar ? navbar.offsetHeight : (isMobile ? 60 : 75);
+      // Less extra padding on mobile for better alignment
+      const extraPadding = isMobile ? 6 : 20;
       const elementPosition = element.offsetTop;
-      // Add extra padding for better visual spacing
-      const offsetPosition = elementPosition - navbarHeight - 20;
+      const offsetPosition = elementPosition - navbarHeight - extraPadding;
 
       window.scrollTo({
         top: offsetPosition,
@@ -114,7 +116,7 @@ const Navbar = () => {
               </div>
             ))}
             <div className="mobile-cta" onClick={() => setMobileMenuOpen(false)}>
-              <button className="mobile-donate-btn">
+              <button className="mobile-donate-btn" onClick={() => handleNavigation("contact")}>
                 <span>Donate Now</span>
               </button>
             </div>

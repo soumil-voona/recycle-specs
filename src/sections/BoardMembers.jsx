@@ -11,16 +11,45 @@ const ProfileCard = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  
+  const ref = React.useRef(null);
+
+  React.useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !isVisible) {
+          setTimeout(() => {
+            setIsVisible(true);
+          }, index * 150);
+        }
+      },
+      { 
+        threshold: 0.2,
+        rootMargin: "-50px 0px -50px 0px"
+      }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => {
+      if (ref.current) {
+        observer.unobserve(ref.current);
+      }
+    };
+  }, [index, isVisible]);
 
   return (
     <div 
-      className={`profile-card ${isHovered ? 'hovered' : ''}`}
+      ref={ref}
+      className={`profile-card ${isHovered ? 'hovered' : ''} ${isVisible ? 'visible' : ''}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       style={{
         '--profile-color': color,
         '--stripe-angle': stripeAngle,
-        '--animation-delay': `${index * 0.1}s`
       }}
     >
       {/* Background diagonal stripes */}
@@ -100,20 +129,20 @@ const ProfileCard = ({
           overflow: hidden;
           border: 1px solid rgba(255, 255, 255, 0.3);
           box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-          transition: all 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
           cursor: pointer;
           transform-style: preserve-3d;
-          animation: fadeInUp 0.8s ease forwards;
-          animation-delay: var(--animation-delay);
+          
+          /* Initial state - hidden */
           opacity: 0;
-          transform: translateY(50px);
+          transform: translateY(50px) scale(0.9);
+          filter: blur(8px);
+          transition: all 0.8s cubic-bezier(0.25, 0.25, 0.25, 1);
         }
 
-        @keyframes fadeInUp {
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+        .profile-card.visible {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+          filter: blur(0px);
         }
 
         .profile-card.hovered {
@@ -121,6 +150,10 @@ const ProfileCard = ({
           box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
           background: rgba(255, 255, 255, 0.95);
           border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-card.visible.hovered {
+          transform: translateY(-12px) scale(1.03);
         }
 
         .profile-bg-stripes {
@@ -169,6 +202,15 @@ const ProfileCard = ({
           position: relative;
           margin-bottom: 1.5rem;
           z-index: 5;
+          opacity: 0;
+          transform: scale(0.8);
+          transition: all 0.6s ease;
+          transition-delay: 0.3s;
+        }
+
+        .profile-card.visible .profile-image-container {
+          opacity: 1;
+          transform: scale(1);
         }
 
         .image-frame {
@@ -278,6 +320,15 @@ const ProfileCard = ({
           position: relative;
           z-index: 5;
           width: 100%;
+          opacity: 0;
+          transform: translateY(20px);
+          transition: all 0.7s ease;
+          transition-delay: 0.5s;
+        }
+
+        .profile-card.visible .profile-content {
+          opacity: 1;
+          transform: translateY(0);
         }
 
         .name-section {
@@ -451,7 +502,6 @@ const ProfileCard = ({
   );
 };
 
-
 const BoardMembers = () => {
   const teamMembers = [
     {
@@ -487,28 +537,57 @@ const BoardMembers = () => {
       stripeAngle: "-135deg"
     },
     {
-      profileImage: "https://via.placeholder.com/150/21544E/ffffff?text=DW",
-      name: "Sidhartha De",
+      profileImage: "/imgs/pfp-sidharta.png",
+      name: "Sidharta De",
       title: "Chief Financial Officer",
-      description: "Waiting...",
+      description: "Sidharta De is a sophomore at Coppell High School. Through his years of experience in speech and debate, he has gained valuable interpersonal and communication skills. He is excited to use these skills as well as his experience in fundraising to Recycle Specs.",
       color: "#21544E",
       stripeAngle: "60deg"
     },
     {
-      profileImage: "https://via.placeholder.com/150/403A3A/ffffff?text=AL",
+      profileImage: "/imgs/pfp-aditi.png",
       name: "Aditi Ahuja",
       title: "Chief Marketing Officer",
-      description: "Waiting...",
+      description: "Aditi Ahuja is a sophomore at Coppell High School. She loves all things creative and hopes to make art that leaves a lasting impression. At RecycleSpecs, Aditi contributes her art with the intent of supporting RecycleSpecs mission and goals.",
       color: "#403A3A",
       stripeAngle: "-60deg"
     }
   ];
 
+  const [headerVisible, setHeaderVisible] = useState(false);
+  const headerRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setHeaderVisible(true);
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    if (headerRef.current) {
+      observer.observe(headerRef.current);
+    }
+
+    return () => {
+      if (headerRef.current) {
+        observer.unobserve(headerRef.current);
+      }
+    };
+  }, []);
+
   return (
     <div className="profile-showcase">
-      <div className="showcase-header">
+      <div 
+        ref={headerRef}
+        className={`showcase-header ${headerVisible ? 'visible' : ''}`}
+      >
         <h2 style={{fontSize: 'clamp(3rem, 8vw, 6rem)'}}>Meet Our Team</h2>
-        <p>Dedicated individuals working together to bring fair optical care services worldwide</p>
+        <p>
+          Dedicated individuals working together to bring fair optical care services worldwide
+        </p>
       </div>
       
       <div className="profiles-grid">
@@ -528,7 +607,7 @@ const BoardMembers = () => {
 
       <style jsx>{`
         .profile-showcase {
-          padding: -10rem 2rem;
+          padding: 2rem 2rem;
           max-width: 1400px;
           margin: 0 auto;
         }
@@ -536,6 +615,16 @@ const BoardMembers = () => {
         .showcase-header {
           text-align: center;
           margin-bottom: 4rem;
+          opacity: 0;
+          transform: translateY(-30px);
+          filter: blur(6px);
+          transition: all 1s cubic-bezier(0.25, 0.25, 0.25, 1);
+        }
+
+        .showcase-header.visible {
+          opacity: 1;
+          transform: translateY(0);
+          filter: blur(0px);
         }
 
         .showcase-header h2 {
@@ -544,7 +633,6 @@ const BoardMembers = () => {
           color: #2d2d2d;
           margin-bottom: 1rem;
           font-weight: 700;
-          margin: 40px
         }
 
         .showcase-header p {
@@ -553,6 +641,12 @@ const BoardMembers = () => {
           color: #666;
           max-width: 800px;
           margin: 0 auto;
+          opacity: 0;
+          transition: opacity 0.8s ease 0.3s;
+        }
+
+        .showcase-header.visible p {
+          opacity: 1;
         }
 
         .profiles-grid {
@@ -582,7 +676,7 @@ const BoardMembers = () => {
 
         @media (max-width: 768px) {
           .profile-showcase {
-            padding: 2rem 1rem;
+            padding: 1.5rem 0.5rem;
           }
 
           .showcase-header h2 {

@@ -64,7 +64,7 @@ const slideFromRightVariants = {
     x: 0,
     scale: 1,
     transition: {
-      duration: 0.9,
+      duration: 1.4,
       ease: [0.16, 1, 0.3, 1], // Smooth spring easing
       staggerChildren: 0.1
     }
@@ -72,12 +72,12 @@ const slideFromRightVariants = {
 }
 
 // Wrapper component for scroll-triggered animations
-const AnimatedSection = ({ children, variants = sectionVariants, className = "", id }) => {
+const AnimatedSection = ({ children, variants = sectionVariants, className = "", id, triggerAmount = 0.2 }) => {
   const ref = useRef(null)
   const [hasAnimated, setHasAnimated] = useState(false)
   const isInView = useInView(ref, { 
     once: true,
-    amount: 0.2, // Reduced from 0.3 for earlier trigger
+    amount: triggerAmount, // Use prop for trigger amount
     margin: "0px 0px -50px 0px" // Less aggressive margin
   })
 
@@ -159,6 +159,7 @@ function App() {
         <AnimatedSection 
           id="board" 
           variants={sectionVariants}
+          triggerAmount={0.01} // Trigger as soon as section enters viewport
         >
           <BoardMembers />
         </AnimatedSection>
