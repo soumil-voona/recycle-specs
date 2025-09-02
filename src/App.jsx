@@ -263,20 +263,8 @@ function App() {
           background: #f1f1f1;
           border-radius: 4px;
         }
-        
-        ::-webkit-scrollbar-thumb {
-          background: linear-gradient(135deg, #c65d07, #e6b800);
-          border-radius: 4px;
-        }
-        
         ::-webkit-scrollbar-thumb:hover {
           background: linear-gradient(135deg, #e67309, #ffcc00);
-        }
-
-        /* Enhance focus states for accessibility */
-        *:focus-visible {
-          outline: 2px solid #c65d07;
-          outline-offset: 2px;
         }
       `}</style>
     </>
