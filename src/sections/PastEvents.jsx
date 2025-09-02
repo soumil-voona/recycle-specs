@@ -63,7 +63,7 @@ const EventCard = ({
 
       {/* Event Image Container */}
       <div className="image-container">
-        <div className="image-frame">
+        <div className="image-frame-events">
           {!imageError ? (
             <img
               src={image}
@@ -240,7 +240,7 @@ const EventCard = ({
           transform: scale(1);
         }
 
-        .image-frame {
+        .image-frame-events {
           position: relative;
           width: 100%;
           height: 200px;
@@ -249,7 +249,7 @@ const EventCard = ({
           transition: all 0.4s ease;
         }
 
-        .event-card.hovered .image-frame {
+        .event-card.hovered .image-frame-events {
           transform: scale(1.05);
           box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
         }
@@ -535,7 +535,7 @@ const EventCard = ({
             padding: 1.5rem;
           }
 
-          .image-frame {
+          .image-frame-events {
             height: 160px;
           }
 
@@ -555,7 +555,7 @@ const EventCard = ({
             padding: 1.2rem;
           }
 
-          .image-frame {
+          .image-frame-events {
             height: 140px;
           }
 
@@ -819,7 +819,7 @@ const PastEvents = () => {
 
   const pastEvents = [
     {
-      image: "/imgs/event1.jpg",
+      image: "/imgs/event1.png",
       title: "Community Children Eye Screening Drive in Guntur, India",
       date: "July, 2025",
       location: "Zilla Parishad High School, Guntur, India",
@@ -829,12 +829,12 @@ const PastEvents = () => {
       stripeAngle: "45deg"
     },
     {
-      image: "/imgs/event2.jpg",
+      image: "/imgs/event2.png",
       title: "Community Senior Citizens Eye Screening Drive in Guntur, India",
       date: "July, 2025",
       location: "Sankara Eye Hospital, Pedakkani, Guntur, India",
       description: "We screened 210 senior citizens, and assessed all needing cataract surgery helping hundreds get the care they need. Huge thanks to Vidhisha Paleti for leading on the ground, Sankara Eye Hospitals for providing full support, and the Rotary Club of Guntur for organizing. Grateful to all who made this possible!",
-      impact: "150 students educated, 25 referrals made",
+      impact: "210 senior citizens screened, 120 cataract surgeries scheduled",
       color: "#c65d07",
       stripeAngle: "-45deg"
     },
