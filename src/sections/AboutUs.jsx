@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 const AboutUs = () => {
-  const [hoveredSection, setHoveredSection] = useState(null);
+  // Removed hoveredSection state - using pure CSS hover now
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -59,9 +59,7 @@ const AboutUs = () => {
     return (
       <div
         ref={ref}
-        className={`section-card ${hoveredSection === index ? 'hovered' : ''} ${sectionVisible ? 'section-visible' : ''}`}
-        onMouseEnter={() => setHoveredSection(index)}
-        onMouseLeave={() => setHoveredSection(null)}
+        className={`section-card ${sectionVisible ? 'section-visible' : ''}`}
         style={{
           '--section-color': section.color,
           '--stripe-angle': section.stripeAngle,
@@ -226,7 +224,7 @@ const AboutUs = () => {
           overflow: hidden;
           border: 1px solid rgba(255, 255, 255, 0.3);
           box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-          transition: all 0.8s cubic-bezier(0.25, 0.25, 0.25, 1);
+          transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
           cursor: pointer;
           
           /* Initial state - hidden */
@@ -241,15 +239,12 @@ const AboutUs = () => {
           filter: blur(0px);
         }
 
-        .section-card.hovered {
+        /* Hover effects only apply to visible cards */
+        .section-card.section-visible:hover {
           transform: translateY(-8px) scale(1.02);
           box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
           background: rgba(255, 255, 255, 0.95);
           border: 1px solid rgba(0, 0, 0, 0.1);
-        }
-
-        .section-card.section-visible.hovered {
-          transform: translateY(-8px) scale(1.02);
         }
 
         .card-bg-stripes {
@@ -316,7 +311,7 @@ const AboutUs = () => {
           transition: all 0.3s ease;
         }
 
-        .section-card.hovered .section-title {
+        .section-card.section-visible:hover .section-title {
           color: var(--section-color);
           transform: translateY(-2px);
         }
@@ -330,7 +325,7 @@ const AboutUs = () => {
           transition: all 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
         }
 
-        .section-card.hovered .title-underline {
+        .section-card.section-visible:hover .title-underline {
           width: 100px;
           box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
         }
@@ -351,7 +346,7 @@ const AboutUs = () => {
           text-align: center;
         }
 
-        .section-card.hovered .section-text {
+        .section-card.section-visible:hover .section-text {
           color: #222;
         }
 
@@ -369,7 +364,7 @@ const AboutUs = () => {
           z-index: 2;
         }
 
-        .section-card.hovered .diagonal-accent {
+        .section-card.section-visible:hover .diagonal-accent {
           opacity: 0.1;
           transform: rotate(var(--stripe-angle)) translateX(40px) translateY(-40px);
         }
@@ -385,7 +380,7 @@ const AboutUs = () => {
           z-index: -1;
         }
 
-        .section-card.hovered .hover-glow {
+        .section-card.section-visible:hover .hover-glow {
           opacity: 0.3;
           animation: glowPulse 2s ease-in-out infinite;
         }
@@ -404,7 +399,7 @@ const AboutUs = () => {
           transition: all 0.4s ease;
         }
 
-        .section-card.hovered .interactive-stripes {
+        .section-card.section-visible:hover .interactive-stripes {
           opacity: 1;
         }
 
@@ -469,7 +464,7 @@ const AboutUs = () => {
             transform: rotate(var(--stripe-angle)) translateX(40px) translateY(-40px);
           }
 
-          .section-card.hovered .diagonal-accent {
+          .section-card.section-visible:hover .diagonal-accent {
             transform: rotate(var(--stripe-angle)) translateX(20px) translateY(-20px);
           }
         }
