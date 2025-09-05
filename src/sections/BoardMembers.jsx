@@ -511,7 +511,7 @@ const BoardMembers = () => {
       profileImage: "/imgs/pfp-vidhisha.png",
       name: "Vidhisha Paleti",
       title: "Chief Executive Officer",
-      description: "Vidhisha Paleti is a rising sophomore at CHS and is excited to launch RecycleSpecs. Growing up with a power of -5 and eventually -8 was a struggle for her in Texas, which begged the question, how much harder is it for people in disadvantage communities to access quality eye care? In addition to RecycleSpecs, Vidhisha was also NJHS and HOSA President where in her ninth grade year, she helped distribute ~504 menstrual products to girls at CHS9. Vidhisha hopes to continue to advocate for quality healthcare in policies.", 
+      description: "Vidhisha Paleti is a current sophomore at CHS and is excited to launch RecycleSpecs. Growing up with a power of -5 and eventually -8 was a struggle for her in Texas, which begged the question, how much harder is it for people in disadvantage communities to access quality eye care? In addition to RecycleSpecs, Vidhisha was also NJHS and HOSA President where in her ninth grade year, she helped distribute ~504 menstrual products to girls at CHS9. Vidhisha hopes to continue to advocate for quality healthcare in policies.", 
       color: "#2d7d7d",
       stripeAngle: "45deg"
     },
@@ -519,7 +519,7 @@ const BoardMembers = () => {
       profileImage: "/imgs/pfp-soukhya.png",
       name: "Soukhya Voona", 
       title: "Chief Operating Officer",
-      description: "Soukhya Voona is a rising sophomore at Coppell High School. At 15 years old and passionate about medicine, she hopes to help those in need through RecycleSpecs. She is willing to use her expertise and leadership experience from past clubs, to manage and help achieve RecycleSpecs' mission.",
+      description: "Soukhya Voona is a current sophomore at Coppell High School. At 15 years old and passionate about medicine, she hopes to help those in need through RecycleSpecs. She is willing to use her expertise and leadership experience from past clubs, to manage and help achieve RecycleSpecs' mission.",
       color: "#c65d07",
       stripeAngle: "135deg"
     },
@@ -527,7 +527,7 @@ const BoardMembers = () => {
       profileImage: "/imgs/pfp-akshata.png",
       name: "Akshata Ghosh",
       title: "Chief Communications Officer", 
-      description: "Akshata Ghosh is a rising sophomore at Coppell High School. She's passionate about law, policies, and international affairs. She manages all things communications and legal of the organization. She's excited to make meaningful impact through her work at RecycleSpecs.",
+      description: "Akshata Ghosh is a current sophomore at Coppell High School. She's passionate about law, policies, and international affairs. She manages all things communications and legal of the organization. She's excited to make meaningful impact through her work at RecycleSpecs.",
       color: "#e6b800",
       stripeAngle: "-45deg"
     },
@@ -550,7 +550,7 @@ const BoardMembers = () => {
     {
       profileImage: "/imgs/pfp-aditi.png",
       name: "Aditi Ahuja",
-      title: "Chief Marketing Officer",
+      title: "Chief Design Officer",
       description: "Aditi Ahuja is a sophomore at Coppell High School. She loves all things creative and hopes to make art that leaves a lasting impression. At RecycleSpecs, Aditi contributes her art with the intent of supporting RecycleSpecs mission and goals.",
       color: "#403A3A",
       stripeAngle: "-60deg"
