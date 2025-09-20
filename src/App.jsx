@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { useInView } from 'framer-motion'
 import { useRef, useState, useEffect } from 'react'
+import { Analytics } from '@vercel/analytics/react';
 import Home from './sections/Home'
 import Navbar from './sections/Navbar'
 import BoardMembers from './sections/BoardMembers'
@@ -318,6 +319,7 @@ function App() {
           }
         }
       `}</style>
+      <Analytics />
     </>
   )
 }
