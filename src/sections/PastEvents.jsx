@@ -785,10 +785,227 @@ const ImageCarousel = ({ images, currentIndex, onIndexChange }) => {
   );
 };
 
+////////////////////////////////////////////////////////////////////////////////
+// NEW: EventCardCarousel - mobile swipeable carousel for EventCard components
+const EventCardCarousel = ({ members, currentIndex, onIndexChange }) => {
+  const trackRef = React.useRef(null);
+  const wrapRef = React.useRef(null);
+  const pointerIdRef = React.useRef(null);
+  const startXRef = React.useRef(0);
+  const isDraggingRef = React.useRef(false);
+  const rafRef = React.useRef(null);
+  const currentTranslateRef = React.useRef(0);
+
+  const goToIndex = (index) => {
+    const wrap = wrapRef.current;
+    if (!wrap || !trackRef.current) return;
+    const w = wrap.clientWidth;
+    const clamped = Math.max(0, Math.min(index, members.length - 1));
+    onIndexChange(clamped);
+    trackRef.current.style.transition = 'transform 420ms cubic-bezier(0.22, 0.9, 0.32, 1)';
+    trackRef.current.style.transform = `translateX(${-clamped * w}px)`;
+    currentTranslateRef.current = -clamped * w;
+  };
+
+  const applyTranslate = (tx) => {
+    if (trackRef.current) {
+      trackRef.current.style.transition = 'none';
+      trackRef.current.style.transform = `translateX(${tx}px)`;
+    }
+  };
+
+  React.useEffect(() => {
+    const wrap = wrapRef.current;
+    if (!wrap) return;
+
+    const onPointerDown = (ev) => {
+      if (ev.isPrimary === false) return;
+      pointerIdRef.current = ev.pointerId;
+      try { wrap.setPointerCapture(pointerIdRef.current); } catch (e) {}
+      isDraggingRef.current = true;
+      startXRef.current = ev.clientX;
+      if (trackRef.current) trackRef.current.style.transition = 'none';
+      wrap.style.touchAction = 'pan-y';
+    };
+
+    const onPointerMove = (ev) => {
+      if (!isDraggingRef.current) return;
+      const wrapW = wrap.clientWidth;
+      const delta = ev.clientX - startXRef.current;
+      const candidate = currentTranslateRef.current + delta;
+      const maxTranslate = 0;
+      const minTranslate = -(members.length - 1) * wrapW;
+      let tx = candidate;
+      if (candidate > maxTranslate + 80) tx = maxTranslate + 80;
+      if (candidate < minTranslate - 80) tx = minTranslate - 80;
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(() => applyTranslate(tx));
+    };
+
+    const onPointerUp = (ev) => {
+      if (!isDraggingRef.current) return;
+      isDraggingRef.current = false;
+      try { wrap.releasePointerCapture(pointerIdRef.current); } catch(e) {}
+      const wrapW = wrap.clientWidth;
+      const delta = ev.clientX - startXRef.current;
+      const threshold = 0.18;
+      let newIndex = currentIndex;
+      if (delta < -wrapW * threshold && currentIndex < members.length - 1) newIndex = currentIndex + 1;
+      else if (delta > wrapW * threshold && currentIndex > 0) newIndex = currentIndex - 1;
+      currentTranslateRef.current = -newIndex * wrapW;
+      goToIndex(newIndex);
+    };
+
+    wrap.addEventListener('pointerdown', onPointerDown);
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('pointercancel', onPointerUp);
+
+    return () => {
+      wrap.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointercancel', onPointerUp);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [members.length, currentIndex]);
+
+  React.useEffect(() => {
+    const wrap = wrapRef.current;
+    if (!wrap || !trackRef.current) return;
+    const w = wrap.clientWidth;
+    trackRef.current.style.transition = 'transform 420ms cubic-bezier(0.22, 0.9, 0.32, 1)';
+    trackRef.current.style.transform = `translateX(${-currentIndex * w}px)`;
+    currentTranslateRef.current = -currentIndex * w;
+  }, [currentIndex]);
+
+  React.useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'ArrowLeft') goToIndex(Math.max(0, currentIndex - 1));
+      if (e.key === 'ArrowRight') goToIndex(Math.min(members.length - 1, currentIndex + 1));
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [currentIndex, members.length]);
+
+  return (
+    <div className="events-card-carousel-container" aria-roledescription="carousel">
+      <button
+        className="nav-arrow left"
+        onClick={() => goToIndex(Math.max(0, currentIndex - 1))}
+        aria-label="Previous event"
+        disabled={currentIndex === 0}
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
+
+      <div className="carousel-viewport" ref={wrapRef}>
+        <div className="carousel-track" ref={trackRef} style={{ transform: `translateX(${-currentIndex * 100}%)` }}>
+          {members.map((m, idx) => (
+            <div key={idx} className="events-carousel-slide" role="group" aria-roledescription="slide" aria-label={`${idx + 1} of ${members.length}`}>
+              <EventCard
+                image={m.image}
+                title={m.title}
+                date={m.date}
+                location={m.location}
+                description={m.description}
+                impact={m.impact}
+                color={m.color}
+                stripeAngle={m.stripeAngle}
+                index={idx}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <button
+        className="nav-arrow right"
+        onClick={() => goToIndex(Math.min(members.length - 1, currentIndex + 1))}
+        aria-label="Next event"
+        disabled={currentIndex === members.length - 1}
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
+
+      <div className="carousel-dots" role="tablist" aria-label="Events">
+        {members.map((_, idx) => (
+          <button
+            key={idx}
+            className={`dot ${idx === currentIndex ? 'active' : ''}`}
+            onClick={() => goToIndex(idx)}
+            aria-label={`Go to event ${idx + 1}`}
+            aria-selected={idx === currentIndex}
+            role="tab"
+          />
+        ))}
+      </div>
+
+      <style jsx>{`
+        .events-card-carousel-container { width: 100%; margin: 0 auto 1.75rem; position: relative; max-width: 420px; }
+        .carousel-viewport { overflow: hidden; touch-action: pan-y; border-radius: 18px; }
+        .carousel-track {
+          display: flex;
+          width: 100%;
+          will-change: transform;
+          user-select: none;
+          -webkit-user-drag: none;
+        }
+        .events-carousel-slide {
+          flex: 0 0 100%;
+          box-sizing: border-box;
+          padding: 0.9rem;
+          display: flex;
+          justify-content: center;
+        }
+
+        /* arrows */
+        .nav-arrow {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.95);
+          border: 0;
+          box-shadow: 0 6px 18px rgba(2,6,23,0.12);
+          cursor: pointer;
+          z-index: 12;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #444;
+          transition: all 220ms ease;
+        }
+        .nav-arrow:hover { transform: translateY(-50%) scale(1.03); color: #c65d07; }
+        .nav-arrow.left { left: 8px; }
+        .nav-arrow.right { right: 8px; }
+        .nav-arrow[disabled] { opacity: 0.45; cursor: default; transform: translateY(-50%); }
+
+        .carousel-dots { display:flex; justify-content:center; gap:0.5rem; margin-top:0.9rem; }
+        .dot { width:9px; height:9px; border-radius:50%; border:none; background: rgba(0,0,0,0.18); padding:0; }
+        .dot.active { background: #c65d07; transform: scale(1.2); }
+
+        /* hide on desktop - remain mobile only */
+        @media (min-width: 769px) { .events-card-carousel-container { display: none; } }
+      `}</style>
+    </div>
+  );
+};
+////////////////////////////////////////////////////////////////////////////////
+
 const PastEvents = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [headerVisible, setHeaderVisible] = useState(false);
   const [currentCarouselIndex, setCurrentCarouselIndex] = useState(0);
+  // mobile event cards carousel index
+  const [currentEventIndex, setCurrentEventIndex] = useState(0);
   const headerRef = useRef(null);
 
   useEffect(() => {
@@ -892,6 +1109,13 @@ const PastEvents = () => {
         onIndexChange={setCurrentCarouselIndex}
       />
 
+      {/* Mobile-only: Event cards carousel (swipeable) */}
+      <EventCardCarousel
+        members={pastEvents}
+        currentIndex={Math.min(currentEventIndex, pastEvents.length - 1)}
+        onIndexChange={setCurrentEventIndex}
+      />
+      
       {/* Events Grid */}
       <div className="events-grid">
         {pastEvents.map((event, index) => (
@@ -1084,6 +1308,10 @@ const PastEvents = () => {
             max-width: 380px;
             gap: 2rem;
           }
+
+          /* Show event-card carousel on small screens and hide the grid there */
+          .events-grid { display: none; } /* mobile uses carousel */
+          .events-card-carousel-container { display: block; margin-bottom: 2rem; }
         }
 
         @media (max-width: 480px) {
