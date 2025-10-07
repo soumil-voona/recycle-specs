@@ -677,6 +677,45 @@ const PublicationCard = ({ image, title, description, link, index = 0 }) => {
           .pub-cta { align-self: stretch; justify-content: center; }
         }
 
+        /* Responsive: enforce vertical (portrait) image on mobile and stack layout */
+        @media (max-width: 768px) {
+          /* ensure publication cards always stack on mobile */
+          .publication-card {
+            flex-direction: column !important;
+            align-items: stretch;
+            padding: 0.9rem;
+            gap: 0.9rem;
+          }
+
+          /* make the image full-width and portrait (letter ratio) */
+          .pub-image {
+            width: 100% !important;
+            flex: 0 0 auto !important;
+            aspect-ratio: 8.5 / 11;   /* portrait */
+            height: auto;
+            border-radius: 12px;
+            margin-bottom: 0.6rem;
+            box-shadow: 0 10px 28px rgba(0,0,0,0.08);
+            overflow: hidden;
+            display: block;
+          }
+
+          /* ensure img fills the portrait container without becoming landscape */
+          .pub-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+          }
+
+          /* adjust text sizes to match new layout */
+          .pub-title { font-size: 1.25rem; }
+          .pub-desc { font-size: 1rem; -webkit-line-clamp: 3; }
+
+          /* keep CTA readable on mobile */
+          .pub-cta { padding: 0.75rem 1rem; font-size: 0.98rem; align-self: center; }
+        }
+
         @media (max-width: 480px) {
           .publications-section { width: 92vw; margin: 2rem auto; }
           .pub-image { aspect-ratio: 8.5 / 11; }
@@ -740,17 +779,11 @@ const Partnerships = () => {
   // Example publications - replace with actual data
   const publications = [
     {
-      image: "/imgs/publication_1.png",
-      title: "Local Times — Recycling Spotlight",
-      description: "Feature on our youth-led initiative bringing eyecare and recycling education to underserved schools.",
-      link: "https://example.com/article-1"
+      image: "/imgs/pub_1.png",
+      title: "Rotary Club of Guntur Vikas - Guntar Vikas (Aug 2025)",
+      description: "The Rotary Club of Guntur (one of our partners) has published the August 2025 article on one of the eye camps we have done in collabaration with them.",
+      link: "/public/guntur_vikas_aug_2025.pdf"
     },
-    {
-      image: "/imgs/publication_2.png",
-      title: "Health Weekly — Vision Outreach",
-      description: "Coverage of our free screening camps and partnerships with local eye-care institutions.",
-      link: "https://example.com/article-2"
-    }
   ];
 
   return (
@@ -1091,7 +1124,7 @@ const Partnerships = () => {
 
         .pub-title {
           margin: 0 0 0.6rem 0;
-          font-size: 2.25rem;     /* increased from ~1.05rem */
+          font-size: 2rem;
           font-weight: 800;
           color: #222;
           line-height: 1.18;
