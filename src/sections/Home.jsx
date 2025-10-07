@@ -81,7 +81,7 @@ const Home = () => {
           background: rgba(255, 255, 255, 0.98);
         }
         
-        .rounded-box h2 {
+        .rounded-box h1 {
           color: #2d2d2d;
           font-size: clamp(2rem, 5vw, 3.5rem); /* always noticeably larger */
           margin: 0 0 1rem 0;

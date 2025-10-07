@@ -78,7 +78,7 @@ const BlurText = ({
   );
 
   return (
-    <h2
+    <h1
       ref={ref}
       className={className}
       style={{ display: 'flex', flexWrap: 'wrap' }}
@@ -109,7 +109,7 @@ const BlurText = ({
           </motion.span>
         );
       })}
-    </h2>
+    </h1>
   );
 };
 
