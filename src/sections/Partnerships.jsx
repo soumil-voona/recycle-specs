@@ -359,7 +359,7 @@ const PartnerCard = ({
         .partner-name {
           font-family: 'DM Serif Text', 'Inter', 'SF Pro Display', -apple-system, sans-serif;
           font-weight: 700;
-          font-size: 1.6rem;
+          font-size: clamp(1.6rem, 2.2vw, 2rem); /* larger and responsive */
           color: #2d2d2d;
           margin: 0;
           letter-spacing: -0.5px;
@@ -374,7 +374,7 @@ const PartnerCard = ({
         .name-underline {
           width: 0;
           height: 3px;
-          background: linear-gradient(90deg, var(--partner-color), #e6b800);
+          background: linear-gradient(90deg, #c65d07, #e6b800);
           margin: 0.5rem auto;
           border-radius: 2px;
           transition: all 0.4s ease;
@@ -392,12 +392,12 @@ const PartnerCard = ({
 
         .partner-description {
           font-family: 'Segoe UI', 'Inter', -apple-system, sans-serif;
-          font-size: 0.95rem;
-          line-height: 1.6;
+          font-size: 1.05rem;   /* increased from 0.95rem */
+          line-height: 1.65;
           color: #555;
           margin: 0;
           transition: all 0.3s ease;
-          opacity: 0.9;
+          opacity: 0.95;
         }
 
         .partner-card.hovered .partner-description {
@@ -412,90 +412,24 @@ const PartnerCard = ({
         .website-link {
           display: inline-flex;
           align-items: center;
-          gap: 0.5rem;
-          padding: 0.75rem 1.5rem;
+          gap: 0.6rem;
+          padding: 0.9rem 1.8rem; /* larger button */
           background: linear-gradient(135deg, var(--partner-color), #e6b800);
           color: white;
           text-decoration: none;
-          border-radius: 12px;
+          border-radius: 14px;
           font-family: 'Inter', 'SF Pro Display', -apple-system, sans-serif;
-          font-weight: 600;
-          font-size: 0.9rem;
+          font-weight: 700;
+          font-size: 1rem;       /* bigger button text */
           transition: all 0.3s ease;
           position: relative;
           overflow: hidden;
         }
 
         .website-link:hover {
-          transform: translateY(-2px) scale(1.05);
-          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+          transform: translateY(-2px) scale(1.04);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
           background: linear-gradient(135deg, #e67309, #ffcc00);
-        }
-
-        .website-link svg {
-          transition: transform 0.3s ease;
-        }
-
-        .website-link:hover svg {
-          transform: translate(2px, -2px);
-        }
-
-        .interactive-stripes {
-          position: absolute;
-          inset: 0;
-          overflow: hidden;
-          border-radius: 24px;
-          opacity: 0;
-          transition: all 0.4s ease;
-        }
-
-        .partner-card.hovered .interactive-stripes {
-          opacity: 1;
-        }
-
-        .interactive-stripe {
-          position: absolute;
-          width: 200%;
-          height: 2px;
-          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
-          left: -50%;
-          animation: interactiveStripeSlide 3s ease-in-out infinite;
-        }
-
-        .interactive-stripe.stripe-i-1 {
-          top: 30%;
-          transform: rotate(var(--stripe-angle));
-          animation-delay: 0s;
-        }
-
-        .interactive-stripe.stripe-i-2 {
-          bottom: 30%;
-          transform: rotate(calc(var(--stripe-angle) * -1));
-          animation-delay: -1.5s;
-        }
-
-        @keyframes interactiveStripeSlide {
-          0%, 100% { 
-            transform: translateX(-30px) rotate(var(--stripe-angle)); 
-          }
-          50% { 
-            transform: translateX(30px) rotate(var(--stripe-angle)); 
-          }
-        }
-
-        .hover-overlay {
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
-          border-radius: 24px;
-          opacity: 0;
-          transition: all 0.4s ease;
-          z-index: 10;
-          pointer-events: none;
-        }
-
-        .partner-card.hovered .hover-overlay {
-          opacity: 1;
         }
 
         /* Mobile Responsiveness */
@@ -539,6 +473,213 @@ const PartnerCard = ({
           .partner-description {
             font-size: 0.85rem;
           }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+// --- New: PublicationCard component ---
+const PublicationCard = ({ image, title, description, link, index = 0 }) => {
+  const [imgError, setImgError] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const ref = React.useRef(null);
+
+  React.useEffect(() => {
+    const obs = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting && !visible) {
+          setTimeout(() => setVisible(true), index * 120);
+        }
+      },
+      { threshold: 0.15, rootMargin: "-30px 0px -30px 0px" }
+    );
+    if (ref.current) obs.observe(ref.current);
+    return () => ref.current && obs.unobserve(ref.current);
+  }, [index, visible]);
+
+  return (
+    <div
+      ref={ref}
+      className={`publication-card ${visible ? 'visible' : ''}`}
+      onClick={() => link && window.open(link, '_blank', 'noopener')}
+      role={link ? 'button' : 'article'}
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === 'Enter' && link) window.open(link, '_blank', 'noopener') }}
+    >
+      <div className="pub-image">
+        {!imgError ? (
+          <img src={image} alt={title} onError={() => setImgError(true)} />
+        ) : (
+          <div className="pub-img-fallback">Image</div>
+        )}
+      </div>
+
+      <div className="pub-content">
+        <h3 className="pub-title">{title}</h3>
+        <p className="pub-desc">{description}</p>
+        {link && (
+          <a
+            className="pub-cta"
+            href={link}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+          >
+            Read Publication
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path d="M7 17L17 7M17 7H7M17 7V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </a>
+        )}
+      </div>
+
+      <style jsx>{`
+        .publication-card {
+          display: flex;
+          gap: 1.25rem;
+          align-items: stretch;
+          background: rgba(255,255,255,0.95);
+          border-radius: 14px;
+          padding: 1rem;
+          box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+          border: 1px solid rgba(0,0,0,0.04);
+          transition: transform 0.35s ease, box-shadow 0.35s ease, opacity 0.6s ease;
+          opacity: 0;
+          transform: translateY(18px);
+          cursor: pointer;
+        }
+
+        .publication-card.visible {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        .publication-card:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+        }
+
+        /* Updated: make image area portrait (letter paper vertical) and more rounded */
+        .pub-image {
+          flex: 0 0 220px;            /* base width on larger screens */
+          aspect-ratio: 8.5 / 11;     /* letter paper portrait (width / height) */
+          height: auto;
+          border-radius: 18px;        /* more rounded */
+          overflow: hidden;
+          background: linear-gradient(135deg,#f6f6f7,#ececec);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .pub-image img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center;
+          display: block;
+        }
+
+        .pub-img-fallback {
+          font-size: 0.95rem;
+          color: #6b6b6b;
+          padding: 0.25rem 0.5rem;
+        }
+
+        .pub-content {
+          flex: 1 1 auto;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          min-width: 0;
+        }
+
+        .pub-title {
+          margin: 0 0 0.6rem 0;
+          font-size: 2rem;
+          font-weight: 800;
+          color: #222;
+          line-height: 1.18;
+        }
+
+        .pub-desc {
+          margin: 0 0 1rem 0;
+          color: #4f4f4f;
+          font-size: 1.2rem;       /* increased from 0.95rem */
+          line-height: 1.5;
+          overflow: hidden;
+          display: -webkit-box;
+          -webkit-line-clamp: 4; /* allow one more line with larger text */
+          -webkit-box-orient: vertical;
+        }
+
+        .pub-cta {
+          align-self: flex-start;
+          display: inline-flex;
+          gap: 0.6rem;
+          align-items: center;
+          padding: 0.75rem 1.2rem; /* larger tappable area */
+          background: linear-gradient(135deg, #2d7d7d, #e6b800);
+          color: white;
+          border-radius: 12px;
+          text-decoration: none;
+          font-weight: 700;
+          font-size: 1rem;       /* bigger button text */
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        /* Publications section: centered, 80% width, one-per-row */
+        .publications-section {
+          position: relative;
+          z-index: 10;
+          width: 80vw;
+          max-width: 1100px;
+          margin: 4rem auto;
+        }
+
+        .publications-header {
+          text-align: center;
+          margin-bottom: 2rem;
+        }
+
+        .publications-header .section-title.small {
+          font-family: 'DM Serif Text', Times, serif;
+          font-size: clamp(1.8rem, 4.5vw, 2.6rem);
+          margin: 0 0 0.5rem 0;
+        }
+
+        .publications-list {
+          display: flex;
+          flex-direction: column;
+          gap: 1.75rem; /* one per row */
+        }
+
+        /* Responsive: stack image above content on small screens */
+        @media (max-width: 700px) {
+          .publication-card {
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 0.75rem;
+          }
+
+          .pub-image {
+            width: 100%;
+            aspect-ratio: 8.5 / 11;   /* preserve portrait letter ratio when full-width */
+            height: auto;
+            flex: 0 0 auto;
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 10px 28px rgba(0,0,0,0.08);
+          }
+
+          .pub-cta { align-self: stretch; justify-content: center; }
+        }
+
+        @media (max-width: 480px) {
+          .publications-section { width: 92vw; margin: 2rem auto; }
+          .pub-image { aspect-ratio: 8.5 / 11; }
         }
       `}</style>
     </div>
@@ -596,6 +737,22 @@ const Partnerships = () => {
     }
   ];
 
+  // Example publications - replace with actual data
+  const publications = [
+    {
+      image: "/imgs/publication_1.png",
+      title: "Local Times — Recycling Spotlight",
+      description: "Feature on our youth-led initiative bringing eyecare and recycling education to underserved schools.",
+      link: "https://example.com/article-1"
+    },
+    {
+      image: "/imgs/publication_2.png",
+      title: "Health Weekly — Vision Outreach",
+      description: "Coverage of our free screening camps and partnerships with local eye-care institutions.",
+      link: "https://example.com/article-2"
+    }
+  ];
+
   return (
     <div className={`partnerships-container ${isVisible ? 'visible' : ''}`}>
       {/* Background diagonal stripes */}
@@ -631,6 +788,27 @@ const Partnerships = () => {
             index={index}
           />
         ))}
+      </div>
+
+      {/* Publications Section */}
+      <div className="publications-section" aria-labelledby="publications-title">
+        <div className="publications-header">
+          <h2 id="publications-title" className="section-title small">Publications</h2>
+          <p className="section-subtitle">Where RecycleSpecs has been featured — click to read the coverage.</p>
+        </div>
+
+        <div className="publications-list">
+          {publications.map((p, i) => (
+            <PublicationCard
+              key={i}
+              image={p.image}
+              title={p.title}
+              description={p.description}
+              link={p.link}
+              index={i}
+            />
+          ))}
+        </div>
       </div>
 
       <style jsx>{`
@@ -822,6 +1000,187 @@ const Partnerships = () => {
           .bg-stripe {
             height: 6vh;
           }
+        }
+
+        /* Publications section: centered, 80% width, one-per-row */
+        .publications-section {
+          position: relative;
+          z-index: 10;
+          width: 80vw;
+          max-width: 1100px;
+          margin: 4rem auto;
+        }
+
+        .publications-header {
+          text-align: center;
+          margin-bottom: 2rem;
+        }
+
+        .publications-header .section-title.small {
+          font-family: 'DM Serif Text', Times, serif;
+          font-size: clamp(1.8rem, 4.5vw, 2.6rem);
+          margin: 0 0 0.5rem 0;
+        }
+
+        .publications-list {
+          display: flex;
+          flex-direction: column;
+          gap: 1.75rem; /* one per row */
+        }
+
+        .publication-card {
+          display: flex;
+          gap: 1.25rem;
+          align-items: stretch;
+          background: rgba(255,255,255,0.95);
+          border-radius: 14px;
+          padding: 1rem;
+          box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+          border: 1px solid rgba(0,0,0,0.04);
+          transition: transform 0.35s ease, box-shadow 0.35s ease, opacity 0.6s ease;
+          opacity: 0;
+          transform: translateY(18px);
+          cursor: pointer;
+        }
+
+        .publication-card.visible {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        .publication-card:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+        }
+
+        /* Updated: make image area portrait (letter paper vertical) and more rounded */
+        .pub-image {
+          flex: 0 0 220px;            /* base width on larger screens */
+          aspect-ratio: 8.5 / 11;     /* letter paper portrait (width / height) */
+          height: auto;
+          border-radius: 18px;        /* more rounded */
+          overflow: hidden;
+          background: linear-gradient(135deg,#f6f6f7,#ececec);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .pub-image img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center;
+          display: block;
+        }
+
+        .pub-img-fallback {
+          font-size: 0.95rem;
+          color: #6b6b6b;
+          padding: 0.25rem 0.5rem;
+        }
+
+        .pub-content {
+          flex: 1 1 auto;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          min-width: 0;
+        }
+
+        .pub-title {
+          margin: 0 0 0.6rem 0;
+          font-size: 2.25rem;     /* increased from ~1.05rem */
+          font-weight: 800;
+          color: #222;
+          line-height: 1.18;
+        }
+
+        .pub-desc {
+          margin: 0 0 1rem 0;
+          color: #4f4f4f;
+          font-size: 1.2rem;       /* increased from 0.95rem */
+          line-height: 1.5;
+          overflow: hidden;
+          display: -webkit-box;
+          -webkit-line-clamp: 4; /* allow one more line with larger text */
+          -webkit-box-orient: vertical;
+        }
+
+        .pub-cta {
+          align-self: flex-start;
+          display: inline-flex;
+          gap: 0.6rem;
+          align-items: center;
+          padding: 0.75rem 1.2rem; /* larger tappable area */
+          background: linear-gradient(135deg, #2d7d7d, #e6b800);
+          color: white;
+          border-radius: 12px;
+          text-decoration: none;
+          font-weight: 700;
+          font-size: 1rem;       /* bigger button text */
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        /* Partner card: larger heading, description, and button */
+        .partner-name {
+          font-family: 'DM Serif Text', 'Inter', 'SF Pro Display', -apple-system, sans-serif;
+          font-weight: 700;
+          font-size: clamp(1.6rem, 2.2vw, 2rem); /* larger and responsive */
+          color: #2d2d2d;
+          margin: 0;
+          letter-spacing: -0.5px;
+          transition: all 0.3s ease;
+        }
+
+        .partner-description {
+          font-family: 'Segoe UI', 'Inter', -apple-system, sans-serif;
+          font-size: 1.05rem;   /* increased from 0.95rem */
+          line-height: 1.65;
+          color: #555;
+          margin: 0;
+          transition: all 0.3s ease;
+          opacity: 0.95;
+        }
+
+        .website-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.6rem;
+          padding: 0.9rem 1.8rem; /* larger button */
+          background: linear-gradient(135deg, var(--partner-color), #e6b800);
+          color: white;
+          text-decoration: none;
+          border-radius: 14px;
+          font-family: 'Inter', 'SF Pro Display', -apple-system, sans-serif;
+          font-weight: 700;
+          font-size: 1rem;       /* bigger button text */
+          transition: all 0.3s ease;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .website-link:hover {
+          transform: translateY(-2px) scale(1.04);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+          background: linear-gradient(135deg, #e67309, #ffcc00);
+        }
+
+        /* Responsive tweaks to keep spacing comfortable */
+        @media (max-width: 700px) {
+          .pub-title { font-size: 1.15rem; }
+          .pub-desc { font-size: 0.98rem; -webkit-line-clamp: 3; }
+          .pub-cta { padding: 0.7rem 1rem; font-size: 0.98rem; }
+
+          .partner-name { font-size: 1.5rem; }
+          .partner-description { font-size: 1rem; }
+          .website-link { padding: 0.75rem 1.2rem; font-size: 0.95rem; }
+        }
+
+        @media (max-width: 480px) {
+          .publications-section { width: 92vw; margin: 2rem auto; }
+          .pub-image { aspect-ratio: 8.5 / 11; }
         }
       `}</style>
     </div>
