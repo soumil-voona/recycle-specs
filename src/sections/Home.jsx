@@ -21,7 +21,7 @@ const Home = () => {
           onAnimationComplete={handleAnimationComplete}
           className="text-2xl mb-8"
         />
-        <p>Welcome to RecycleSpecs! We are a youth-led nonprofit designed to spread optical awareness and wellness around the world, especially targeting underprivileged youth who don’t have access to optical resources. </p>
+        <p>Welcome to RecycleSpecs! We are so excited to launch this initiative and spread awareness about an underrated yet crucial topic-optical awareness. We aim to redistribute eyeglasses and increase accessibility to eye care. Follow to support our journey!</p>
       </div>
       
       <style jsx>{`

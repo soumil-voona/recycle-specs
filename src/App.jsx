@@ -1,13 +1,18 @@
 import { motion } from 'framer-motion'
 import { useInView } from 'framer-motion'
 import { useRef, useState, useEffect } from 'react'
+import { Routes, Route } from 'react-router-dom'
 import { Analytics } from '@vercel/analytics/react';
 import Home from './sections/Home'
 import Navbar from './sections/Navbar'
 import BoardMembers from './sections/BoardMembers'
 import AboutUs from './sections/AboutUs'
 import Partnerships from './sections/Partnerships'
-import PastEvents from './sections/PastEvents' 
+import PastEvents from './sections/PastEvents'
+import Volunteers from './sections/Volunteers'
+import Login from './sections/Login'
+import Signup from './sections/Signup'
+import ProtectedRoute from './components/ProtectedRoute' 
 
 // Animation variants for different section types
 const sectionVariants = {
@@ -137,126 +142,145 @@ const HomeSection = ({ children }) => {
   )
 }
 
+// HomePage component - wraps all the main landing page sections
+const HomePage = () => {
+  return (
+    <motion.div 
+      style={{ 
+        paddingTop: "70px",
+        overflow: 'hidden',
+        width: '100%',
+        position: 'relative'
+      }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      {/* Home Section */}
+      <HomeSection>
+        <Home />
+      </HomeSection>
+
+      {/* About Us Section */}
+      <AnimatedSection 
+        id="about" 
+        variants={alternateVariants}
+      >
+        <AboutUs />
+      </AnimatedSection>
+
+      {/* Board Members Section */}
+      <AnimatedSection 
+        id="board" 
+        variants={sectionVariants}
+        triggerAmount={0.01}
+      >
+        <BoardMembers />
+      </AnimatedSection>
+
+      {/* Past Events Section - NEW */}
+      <AnimatedSection 
+        id="past-events" 
+        variants={slideFromRightVariants}
+      >
+        <PastEvents />
+      </AnimatedSection>
+
+      {/* Partnerships Section */}
+      <AnimatedSection 
+        id="partnerships" 
+        variants={alternateVariants}
+      >
+        <Partnerships />
+      </AnimatedSection>
+
+      {/* Contact Section */}
+      <AnimatedSection 
+        id="contact" 
+        variants={sectionVariants}
+      >
+        <motion.div
+          variants={{
+            hidden: { opacity: 0, y: 50 },
+            visible: { 
+              opacity: 1, 
+              y: 0,
+              transition: { duration: 0.6, ease: 'easeOut' }
+            }
+          }}
+          style={{
+            minHeight: '400px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'linear-gradient(135deg, rgba(45, 125, 125, 0.1), rgba(196, 93, 7, 0.1))',
+            margin: '4rem 0',
+            borderRadius: '2rem',
+            backdropFilter: 'blur(10px)',
+            width: '100%',
+            overflow: 'hidden'
+          }}
+        >
+          <motion.div
+            variants={{
+              hidden: { scale: 0.8, opacity: 0 },
+              visible: { 
+                scale: 1, 
+                opacity: 1,
+                transition: { delay: 0.2, duration: 0.5 }
+              }
+            }}
+            style={{
+              textAlign: 'center',
+              padding: '3rem',
+              color: '#2d2d2d',
+              maxWidth: '100%'
+            }}
+          >
+            <h2 style={{
+              fontFamily: "'DM Serif Text', serif",
+              fontSize: 'clamp(2rem, 4vw, 3rem)',
+              marginBottom: '1rem',
+              fontWeight: 700
+            }}>
+              Contact Us
+            </h2>
+            <p style={{
+              fontFamily: "'Segoe UI', sans-serif",
+              fontSize: '1.1rem',
+              opacity: 0.8,
+              maxWidth: '600px'
+            }}>
+              Ready to make a difference? Get in touch with our team to learn more about RecycleSpecs and how you can help bring optical care to communities in need.
+              <br />
+              <br />
+              Email us at <br /><a href="mailto:recycle.specs@gmail.com" style={{ color: '#c65d07' }}>recycle.specs@gmail.com</a>
+            </p>
+          </motion.div>
+        </motion.div>
+      </AnimatedSection>
+    </motion.div>
+  )
+}
+
 function App() {
   return (
     <>
       <Navbar />
       
-      <motion.div 
-        style={{ 
-          paddingTop: "70px",
-          overflow: 'hidden',
-          width: '100%',
-          position: 'relative'
-        }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        {/* Home Section */}
-        <HomeSection>
-          <Home />
-        </HomeSection>
-
-        {/* About Us Section */}
-        <AnimatedSection 
-          id="about" 
-          variants={alternateVariants}
-        >
-          <AboutUs />
-        </AnimatedSection>
-
-        {/* Board Members Section */}
-        <AnimatedSection 
-          id="board" 
-          variants={sectionVariants}
-          triggerAmount={0.01}
-        >
-          <BoardMembers />
-        </AnimatedSection>
-
-        {/* Past Events Section - NEW */}
-        <AnimatedSection 
-          id="past-events" 
-          variants={slideFromRightVariants}
-        >
-          <PastEvents />
-        </AnimatedSection>
-
-        {/* Partnerships Section */}
-        <AnimatedSection 
-          id="partnerships" 
-          variants={alternateVariants}
-        >
-          <Partnerships />
-        </AnimatedSection>
-
-        {/* Contact Section */}
-        <AnimatedSection 
-          id="contact" 
-          variants={sectionVariants}
-        >
-          <motion.div
-            variants={{
-              hidden: { opacity: 0, y: 50 },
-              visible: { 
-                opacity: 1, 
-                y: 0,
-                transition: { duration: 0.6, ease: 'easeOut' }
-              }
-            }}
-            style={{
-              minHeight: '400px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'linear-gradient(135deg, rgba(45, 125, 125, 0.1), rgba(196, 93, 7, 0.1))',
-              margin: '4rem 0',
-              borderRadius: '2rem',
-              backdropFilter: 'blur(10px)',
-              width: '100%',
-              overflow: 'hidden'
-            }}
-          >
-            <motion.div
-              variants={{
-                hidden: { scale: 0.8, opacity: 0 },
-                visible: { 
-                  scale: 1, 
-                  opacity: 1,
-                  transition: { delay: 0.2, duration: 0.5 }
-                }
-              }}
-              style={{
-                textAlign: 'center',
-                padding: '3rem',
-                color: '#2d2d2d',
-                maxWidth: '100%'
-              }}
-            >
-              <h2 style={{
-                fontFamily: "'DM Serif Text', serif",
-                fontSize: 'clamp(2rem, 4vw, 3rem)',
-                marginBottom: '1rem',
-                fontWeight: 700
-              }}>
-                Contact Us
-              </h2>
-              <p style={{
-                fontFamily: "'Segoe UI', sans-serif",
-                fontSize: '1.1rem',
-                opacity: 0.8,
-                maxWidth: '600px'
-              }}>
-                Ready to make a difference? Get in touch with our team to learn more about RecycleSpecs and how you can help bring optical care to communities in need.
-                <br />
-                <br />
-                Email us at <br /><a href="mailto:recycle.specs@gmail.com" style={{ color: '#c65d07' }}>recycle.specs@gmail.com</a>
-              </p>
-            </motion.div>
-          </motion.div>
-        </AnimatedSection>
-      </motion.div>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route 
+          path="/volunteers" 
+          element={
+            <ProtectedRoute>
+              <Volunteers />
+            </ProtectedRoute>
+          } 
+        />
+      </Routes>
 
       <style jsx global>{`
         html {

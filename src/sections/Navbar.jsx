@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Navbar = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [hoveredTab, setHoveredTab] = useState(null);
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -18,19 +21,48 @@ const Navbar = () => {
     { name: 'About', color: '#c65d07', angle: '135deg' },
     { name: 'Board', color: '#e6b800', angle: '-135deg' },
     { name: 'Events', color: '#5b8b5b', angle: '-45deg' },
-    { name: 'Partnerships', color: '#4a4a4a', angle: '45deg' }
+    { name: 'Partnerships', color: '#4a4a4a', angle: '45deg' },
+    { name: 'Volunteers', color: '#8b5ba8', angle: '135deg', route: '/volunteers' }
   ];
 
-  const handleNavigation = (itemName) => {
+  const handleNavigation = (itemName, route) => {
+    // If there's a route, navigate to that route
+    if (route) {
+      navigate(route);
+      return;
+    }
+
+    // If not on home page, navigate to home first
+    if (location.pathname !== '/') {
+      navigate('/');
+      // Use setTimeout to allow navigation to complete before scrolling
+      setTimeout(() => {
+        const targetId = itemName.toLowerCase();
+        const element = document.getElementById(targetId);
+        if (element) {
+          const navbar = document.querySelector('.navbar-wrapper');
+          const isMobile = window.innerWidth <= 900;
+          const navbarHeight = navbar ? navbar.offsetHeight : (isMobile ? 60 : 75);
+          const extraPadding = isMobile ? 6 : 20;
+          const elementPosition = element.offsetTop;
+          const offsetPosition = elementPosition - navbarHeight - extraPadding;
+
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+        }
+      }, 100);
+      return;
+    }
+
+    // If already on home page, just scroll
     const targetId = itemName.toLowerCase();
     const element = document.getElementById(targetId);
     if (element) {
-      // Dynamic navbar height detection
       const navbar = document.querySelector('.navbar-wrapper');
-      // Use smaller offset on mobile
       const isMobile = window.innerWidth <= 900;
       const navbarHeight = navbar ? navbar.offsetHeight : (isMobile ? 60 : 75);
-      // Less extra padding on mobile for better alignment
       const extraPadding = isMobile ? 6 : 20;
       const elementPosition = element.offsetTop;
       const offsetPosition = elementPosition - navbarHeight - extraPadding;
@@ -40,15 +72,14 @@ const Navbar = () => {
         behavior: 'smooth'
       });
     } else {
-      // Fallback to hash navigation if element doesn't exist
       window.location.hash = `#${targetId}`;
     }
   };
 
-  const handleMobileNavigation = (itemName) => {
+  const handleMobileNavigation = (itemName, route) => {
     setMobileMenuOpen(false);
     setTimeout(() => {
-      handleNavigation(itemName);
+      handleNavigation(itemName, route);
     }, 300); // Small delay to allow menu to close
   };
 
@@ -56,7 +87,7 @@ const Navbar = () => {
     <div className={`navbar-wrapper ${scrolled ? 'scrolled' : ''}`}>
       <div className="nav-container">
         {/* Logo */}
-        <div className="logo-section" onClick={() => handleNavigation('Home')}>
+        <div className="logo-section" onClick={() => navigate('/')}>
           <img src = '/imgs/logo.png' style={{height: '60px'}} />
           <span className="logo-text">RECYCLE SPECS</span>
         </div>
@@ -69,7 +100,7 @@ const Navbar = () => {
               className={`nav-tab ${hoveredTab === index ? 'hovered' : ''}`}
               onMouseEnter={() => setHoveredTab(index)}
               onMouseLeave={() => setHoveredTab(null)}
-              onClick={() => handleNavigation(item.name)}
+              onClick={() => handleNavigation(item.name, item.route)}
               style={{
                 '--tab-color': item.color,
                 '--stripe-angle': item.angle,
@@ -114,7 +145,7 @@ const Navbar = () => {
                   '--item-color': item.color,
                   '--item-delay': `${index * 0.1}s`
                 }}
-                onClick={() => handleMobileNavigation(item.name)}
+                onClick={() => handleMobileNavigation(item.name, item.route)}
               >
                 <span>{item.name}</span>
                 <div className="mobile-item-stripe"></div>
