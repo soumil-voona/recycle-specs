@@ -143,7 +143,8 @@ function Login() {
                 fontSize: '1rem',
                 fontFamily: "'Segoe UI', sans-serif",
                 transition: 'border-color 0.3s ease',
-                boxSizing: 'border-box'
+                boxSizing: 'border-box',
+                color: '#333'
               }}
               onFocus={(e) => e.target.style.borderColor = '#c65d07'}
               onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
