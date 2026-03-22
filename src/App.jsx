@@ -181,7 +181,7 @@ const HomePage = () => {
 
       {/* Past Events Section - NEW */}
       <AnimatedSection 
-        id="past-events" 
+        id="events" 
         variants={slideFromRightVariants}
       >
         <PastEvents />
