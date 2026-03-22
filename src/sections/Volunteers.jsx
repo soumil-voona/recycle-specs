@@ -32,6 +32,46 @@ function Volunteers() {
   const [loadingEvents, setLoadingEvents] = useState(true);
   const [signingUp, setSigningUp] = useState({});
 
+  function formatEventDate(dateValue) {
+    if (!dateValue) return '';
+
+    function getOrdinalSuffix(day) {
+      if (day >= 11 && day <= 13) return 'th';
+      const lastDigit = day % 10;
+      if (lastDigit === 1) return 'st';
+      if (lastDigit === 2) return 'nd';
+      if (lastDigit === 3) return 'rd';
+      return 'th';
+    }
+
+    function formatMonthDayWithOrdinal(date) {
+      const month = date.toLocaleString([], { month: 'long' });
+      const day = date.getDate();
+      return `${month} ${day}${getOrdinalSuffix(day)}`;
+    }
+
+    if (typeof dateValue === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateValue)) {
+      const [year, month, day] = dateValue.split('-').map(Number);
+      return formatMonthDayWithOrdinal(new Date(year, month - 1, day));
+    }
+
+    const parsedDate = new Date(dateValue);
+    return Number.isNaN(parsedDate.getTime()) ? dateValue : formatMonthDayWithOrdinal(parsedDate);
+  }
+
+  function formatEventTime(timeValue) {
+    if (!timeValue || typeof timeValue !== 'string') return '';
+
+    const [hourString, minuteString] = timeValue.split(':');
+    const hours = Number(hourString);
+    const minutes = Number(minuteString);
+
+    if (Number.isNaN(hours) || Number.isNaN(minutes)) return timeValue;
+
+    const date = new Date(2000, 0, 1, hours, minutes);
+    return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+  }
+
   useEffect(() => {
     async function fetchUserData() {
       if (currentUser) {
@@ -130,6 +170,42 @@ function Volunteers() {
     } catch (error) {
       console.error('Error signing up:', error);
       alert('Failed to sign up. Please try again.');
+    } finally {
+      setSigningUp(prev => ({ ...prev, [eventId]: false }));
+    }
+  }
+
+  async function handleUnsignup(eventId) {
+    if (!currentUser) return;
+
+    setSigningUp(prev => ({ ...prev, [eventId]: true }));
+
+    try {
+      const eventRef = doc(db, 'events', eventId);
+      const eventSnap = await getDoc(eventRef);
+
+      if (!eventSnap.exists()) {
+        throw new Error('Event not found');
+      }
+
+      const eventData = eventSnap.data();
+      const currentSignups = eventData.signups || [];
+      const updatedSignups = currentSignups.filter(signup => signup.uid !== currentUser.uid);
+
+      await updateDoc(eventRef, {
+        signups: updatedSignups
+      });
+
+      setEvents(prevEvents =>
+        prevEvents.map(event =>
+          event.id === eventId
+            ? { ...event, signups: (event.signups || []).filter(signup => signup.uid !== currentUser.uid) }
+            : event
+        )
+      );
+    } catch (error) {
+      console.error('Error canceling signup:', error);
+      alert('Failed to cancel signup. Please try again.');
     } finally {
       setSigningUp(prev => ({ ...prev, [eventId]: false }));
     }
@@ -394,11 +470,11 @@ function Volunteers() {
                           <strong>📍 Location:</strong> {event.location}
                         </p>
                         <p style={{ marginBottom: '0.5rem' }}>
-                          <strong>📅 Date:</strong> {new Date(event.date).toLocaleDateString()}
+                          <strong>📅 Date:</strong> {formatEventDate(event.date)}
                         </p>
                         {event.startTime && event.endTime && (
                           <p style={{ marginBottom: '0.5rem' }}>
-                            <strong>🕒 Time:</strong> {event.startTime} - {event.endTime}
+                            <strong>🕒 Time:</strong> {formatEventTime(event.startTime)} - {formatEventTime(event.endTime)}
                           </p>
                         )}
                         <p style={{ marginBottom: '0.5rem' }}>
@@ -419,13 +495,13 @@ function Volunteers() {
                       </p>
                       
                       <button
-                        onClick={() => handleSignup(event.id)}
-                        disabled={isSignedUp || isFull || signingUp[event.id]}
+                        onClick={() => isSignedUp ? handleUnsignup(event.id) : handleSignup(event.id)}
+                        disabled={(!isSignedUp && isFull) || signingUp[event.id]}
                         style={{
                           width: '100%',
                           padding: '0.75rem',
                           background: isSignedUp 
-                            ? '#4caf50' 
+                            ? '#d32f2f' 
                             : isFull 
                               ? '#ccc' 
                               : 'linear-gradient(135deg, #c65d07, #e6b800)',
@@ -435,15 +511,15 @@ function Volunteers() {
                           fontSize: '1rem',
                           fontWeight: 600,
                           fontFamily: "'Segoe UI', sans-serif",
-                          cursor: isSignedUp || isFull || signingUp[event.id] ? 'not-allowed' : 'pointer',
+                          cursor: ((!isSignedUp && isFull) || signingUp[event.id]) ? 'not-allowed' : 'pointer',
                           transition: 'all 0.3s ease',
-                          opacity: isSignedUp || isFull ? 0.7 : 1
+                          opacity: ((!isSignedUp && isFull) || isSignedUp) ? 0.85 : 1
                         }}
                       >
                         {signingUp[event.id] 
-                          ? 'Signing up...' 
+                          ? (isSignedUp ? 'Canceling...' : 'Signing up...')
                           : isSignedUp 
-                            ? '✓ Signed Up' 
+                            ? 'Cancel Signup' 
                             : isFull 
                               ? 'Event Full' 
                               : 'Sign Up'}
