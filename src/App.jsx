@@ -10,6 +10,7 @@ import AboutUs from './sections/AboutUs'
 import Partnerships from './sections/Partnerships'
 import PastEvents from './sections/PastEvents'
 import Volunteers from './sections/Volunteers'
+import Easter from './sections/Easter'
 import Login from './sections/Login'
 import Signup from './sections/Signup'
 import ProtectedRoute from './components/ProtectedRoute' 
@@ -272,6 +273,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/easter" element={<Easter />} />
         <Route 
           path="/volunteers" 
           element={
