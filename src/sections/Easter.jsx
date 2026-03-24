@@ -216,7 +216,7 @@ function Easter() {
               <strong style={{ color: '#c65d07' }}>Where:</strong> The Palmer @ Las Colinas 
             </div>
             <div>
-              <strong style={{ color: '#c65d07' }}>Entry:</strong> $5 via PayPal before event to {'Phone Number'} or $10 at the door
+              <strong style={{ color: '#c65d07' }}>Entry:</strong> $5 via PayPal before event to {'PayPal'} or $8 at the door
             </div>
             <div style={{ marginTop: '0.5rem', color: '#666', fontSize: '0.9rem' }}>
               Please take a screenshot of your PayPal payment as proof of registration.
