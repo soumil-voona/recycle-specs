@@ -213,10 +213,31 @@ function Easter() {
               <strong style={{ color: '#c65d07' }}>When:</strong> Easter Sunday (04/05/2026) @ 11:00 am - 1pm
             </div>
             <div>
-              <strong style={{ color: '#c65d07' }}>Where:</strong> The Palmer @ Las Colinas 
+              <strong style={{ color: '#c65d07' }}>Where:</strong> Main pool The Palmer @ Las Colinas (2940 W Royal Ln, Irving, TX 75063)
             </div>
             <div>
-              <strong style={{ color: '#c65d07' }}>Entry:</strong> $5 via PayPal before event to {'PayPal'} or $8 at the door
+              <strong style={{ color: '#c65d07' }}>Entry:</strong> $5 early signup (through paypal to 945-249-2128) or $8 at the door
+            </div>
+            <div>
+            <a
+              href={"https://www.paypal.com/ncp/payment/KGV4KZGYBGN7Q"}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-block',
+                width: 'fit-content',
+                padding: '0.65rem 1.2rem',
+                background: 'linear-gradient(135deg, #c65d07, #e6b800)',
+                color: '#fff',
+                borderRadius: '0.5rem',
+                textDecoration: 'none',
+                fontWeight: 600,
+                fontFamily: "'Segoe UI', sans-serif",
+                fontSize: '0.95rem'
+              }}
+            >
+              Pay with PayPal
+            </a>
             </div>
             <div style={{ marginTop: '0.5rem', color: '#666', fontSize: '0.9rem' }}>
               Please take a screenshot of your PayPal payment as proof of registration.
