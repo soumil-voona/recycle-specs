@@ -2,7 +2,7 @@ import { motion } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
-import { doc, getDoc, collection, addDoc, getDocs, query, orderBy, updateDoc, arrayUnion } from 'firebase/firestore'
+import { doc, getDoc, collection, addDoc, getDocs, query, orderBy, setDoc, deleteDoc, where } from 'firebase/firestore'
 import { db } from '../firebase'
 import { uploadToCloudinary } from '../utils/cloudinary'
 
@@ -26,6 +26,10 @@ function Volunteers() {
   const [imagePreview, setImagePreview] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [uploadMessage, setUploadMessage] = useState('');
+  
+  // Volunteer signups states
+  const [volunteerSignups, setVolunteerSignups] = useState({});
+  const [loadingSignups, setLoadingSignups] = useState(true);
   
   // Events display states
   const [events, setEvents] = useState([]);
@@ -112,6 +116,32 @@ function Volunteers() {
     fetchEvents();
   }, []);
 
+  useEffect(() => {
+    async function fetchVolunteerSignups() {
+      try {
+        const signupsSnapshot = await getDocs(collection(db, 'volunteers'));
+        const signupsMap = {};
+        
+        signupsSnapshot.docs.forEach(doc => {
+          const data = doc.data();
+          const eventId = data.eventId;
+          
+          if (!signupsMap[eventId]) {
+            signupsMap[eventId] = [];
+          }
+          signupsMap[eventId].push(data);
+        });
+        
+        setVolunteerSignups(signupsMap);
+      } catch (error) {
+        console.error('Error fetching volunteer signups:', error);
+      } finally {
+        setLoadingSignups(false);
+      }
+    }
+    fetchVolunteerSignups();
+  }, []);
+
   async function handleLogout() {
     try {
       setLoggingOut(true);
@@ -142,31 +172,28 @@ function Volunteers() {
     setSigningUp(prev => ({ ...prev, [eventId]: true }));
     
     try {
-      const eventRef = doc(db, 'events', eventId);
-      await updateDoc(eventRef, {
-        signups: arrayUnion({
+      const signupId = `${currentUser.uid}-${eventId}`;
+      await setDoc(doc(db, 'volunteers', signupId), {
+        uid: currentUser.uid,
+        eventId: eventId,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        email: currentUser.email,
+        signedUpAt: new Date().toISOString()
+      });
+      
+      // Update local state
+      setVolunteerSignups(prevSignups => ({
+        ...prevSignups,
+        [eventId]: [...(prevSignups[eventId] || []), {
           uid: currentUser.uid,
+          eventId: eventId,
           firstName: userData.firstName,
           lastName: userData.lastName,
           email: currentUser.email,
           signedUpAt: new Date().toISOString()
-        })
-      });
-      
-      // Update local state
-      setEvents(prevEvents => 
-        prevEvents.map(event => 
-          event.id === eventId 
-            ? { ...event, signups: [...(event.signups || []), {
-                uid: currentUser.uid,
-                firstName: userData.firstName,
-                lastName: userData.lastName,
-                email: currentUser.email,
-                signedUpAt: new Date().toISOString()
-              }]}
-            : event
-        )
-      );
+        }]
+      }));
     } catch (error) {
       console.error('Error signing up:', error);
       alert('Failed to sign up. Please try again.');
@@ -181,28 +208,13 @@ function Volunteers() {
     setSigningUp(prev => ({ ...prev, [eventId]: true }));
 
     try {
-      const eventRef = doc(db, 'events', eventId);
-      const eventSnap = await getDoc(eventRef);
+      const signupId = `${currentUser.uid}-${eventId}`;
+      await deleteDoc(doc(db, 'volunteers', signupId));
 
-      if (!eventSnap.exists()) {
-        throw new Error('Event not found');
-      }
-
-      const eventData = eventSnap.data();
-      const currentSignups = eventData.signups || [];
-      const updatedSignups = currentSignups.filter(signup => signup.uid !== currentUser.uid);
-
-      await updateDoc(eventRef, {
-        signups: updatedSignups
-      });
-
-      setEvents(prevEvents =>
-        prevEvents.map(event =>
-          event.id === eventId
-            ? { ...event, signups: (event.signups || []).filter(signup => signup.uid !== currentUser.uid) }
-            : event
-        )
-      );
+      setVolunteerSignups(prevSignups => ({
+        ...prevSignups,
+        [eventId]: (prevSignups[eventId] || []).filter(signup => signup.uid !== currentUser.uid)
+      }));
     } catch (error) {
       console.error('Error canceling signup:', error);
       alert('Failed to cancel signup. Please try again.');
@@ -412,8 +424,9 @@ function Volunteers() {
               marginBottom: '4rem'
             }}>
               {events.map((event) => {
-                const isSignedUp = event.signups?.some(signup => signup.uid === currentUser.uid);
-                const signupCount = event.signups?.length || 0;
+                const eventSignups = volunteerSignups[event.id] || [];
+                const isSignedUp = eventSignups.some(signup => signup.uid === currentUser.uid);
+                const signupCount = eventSignups.length;
                 const isFull = event.capacity !== 'unlimited' && signupCount >= event.capacity;
                 
                 return (
@@ -495,13 +508,13 @@ function Volunteers() {
                       </p>
                       
                       <button
-                        onClick={() => isSignedUp ? handleUnsignup(event.id) : handleSignup(event.id)}
-                        disabled={(!isSignedUp && isFull) || signingUp[event.id]}
+                        onClick={() => handleSignup(event.id)}
+                        disabled={(!isSignedUp && isFull) || isSignedUp || signingUp[event.id]}
                         style={{
                           width: '100%',
                           padding: '0.75rem',
                           background: isSignedUp 
-                            ? '#d32f2f' 
+                            ? '#999' 
                             : isFull 
                               ? '#ccc' 
                               : 'linear-gradient(135deg, #c65d07, #e6b800)',
@@ -511,15 +524,15 @@ function Volunteers() {
                           fontSize: '1rem',
                           fontWeight: 600,
                           fontFamily: "'Segoe UI', sans-serif",
-                          cursor: ((!isSignedUp && isFull) || signingUp[event.id]) ? 'not-allowed' : 'pointer',
+                          cursor: ((!isSignedUp && isFull) || isSignedUp || signingUp[event.id]) ? 'not-allowed' : 'pointer',
                           transition: 'all 0.3s ease',
                           opacity: ((!isSignedUp && isFull) || isSignedUp) ? 0.85 : 1
                         }}
                       >
                         {signingUp[event.id] 
-                          ? (isSignedUp ? 'Canceling...' : 'Signing up...')
+                          ? 'Signing up...'
                           : isSignedUp 
-                            ? 'Cancel Signup' 
+                            ? 'Signed Up' 
                             : isFull 
                               ? 'Event Full' 
                               : 'Sign Up'}
