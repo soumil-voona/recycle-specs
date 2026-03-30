@@ -243,7 +243,7 @@ function Easter() {
               Please take a screenshot of your PayPal payment as proof of registration.
             </div>
             <p style={{ marginTop: '0.5rem', lineHeight: 1.6 }}>
-              Join us for a fun-filled In-Water Easter Egg Hunt Fundraiser hosted by RecycleSpecs at Palmer's Pool in Las Colinas! From 11 AM to 1 PM, kids and families can enjoy diving for eggs in the pool, collecting treats, and celebrating Easter in a unique way. There will be exciting extras like waterproof face painting, balloon making, and an ice cream truck, plus concessions available on-site. All proceeds go toward supporting RecycleSpecs' mission of providing eyecare access to underserved communities. Come out, have fun, and make an impact!
+              Join us for a fun-filled In-Water Easter Egg Hunt Fundraiser hosted by RecycleSpecs at Palmer's Pool in Las Colinas! On Friday, April 3rd from 5 p.m. to 7 p.m., kids and families can enjoy diving for eggs in the pool, collecting treats, and celebrating Easter in a unique way. There will be exciting extras like face painting and a Kona Ice truck, plus concessions available on-site. All proceeds go toward supporting RecycleSpecs' mission of providing eyecare access to underserved communities. Come out, have fun, and make an impact!
             </p>
           </div>
         </motion.div>
