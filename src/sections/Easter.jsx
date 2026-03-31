@@ -171,7 +171,7 @@ function Easter() {
               marginBottom: '1.5rem'
             }}
           >
-            Join us for a fun-filled Easter celebration! Sign up to participate.
+            Join us for a fun-filled Easter celebration! Sign up to participate. Contact <a href="mailto:recycle.specs@gmail.com">recycle.specs@gmail.com</a> for more information.
           </p>
         </motion.div>
 
