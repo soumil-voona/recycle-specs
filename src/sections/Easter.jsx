@@ -213,7 +213,7 @@ function Easter() {
               <strong style={{ color: '#c65d07' }}>When:</strong> Good Friday (04/03/2026) @ 5:00 pm - 7:00 pm
             </div>
             <div>
-              <strong style={{ color: '#c65d07' }}>Where:</strong> Main pool The Palmer @ Las Colinas<br />(2940 W Royal Ln, Irving, TX 75063)
+              <strong style={{ color: '#c65d07' }}>Where:</strong> Small pool The Palmer @ Las Colinas<br />(2940 W Royal Ln, Irving, TX 75063)
             </div>
             <div>
               <strong style={{ color: '#c65d07' }}>Entry:</strong> $5 early signup (through paypal to 945-249-2128) or $8 at the door
