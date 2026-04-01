@@ -22,7 +22,7 @@ const Navbar = () => {
     { name: 'Board', color: '#e6b800', angle: '-135deg' },
     { name: 'Events', color: '#5b8b5b', angle: '-45deg' },
     { name: 'Partnerships', color: '#4a4a4a', angle: '45deg' },
-    { name: 'Easter', color: '#d4a574', angle: '45deg', route: '/easter' },
+    // { name: 'Easter', color: '#d4a574', angle: '45deg', route: '/easter' },
     { name: 'Volunteers', color: '#8b5ba8', angle: '135deg', route: '/volunteers' }
   ];
 
