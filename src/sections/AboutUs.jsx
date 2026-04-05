@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { Dialog, DialogContent, IconButton, Typography, Box } from '@mui/material';
 
 const AboutUs = () => {
   // Removed hoveredSection state - using pure CSS hover now
   const [isVisible, setIsVisible] = useState(false);
+  const [activeImpact, setActiveImpact] = useState(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 100);
@@ -23,6 +25,42 @@ const AboutUs = () => {
       content: 'To advance optical awareness by empowering and educating communities through accessible resources and outreach.',
       color: '#2d7d7d',
       stripeAngle: '-45deg'
+    }
+  ];
+
+  const impactStats = [
+    {
+      id: 'screened',
+      label: 'People Screened',
+      value: '595',
+      accent: '#2d7d7d',
+      summary: 'Total number of people who received eye screenings through our programs.',
+      breakdown: [
+        'Community Children Eye Screening Drive in Guntur, India: 385',
+        'Community Senior Citizens Eye Screening Drive in Guntur, India: 210',
+        'Individual follow-ups: 120'
+      ]
+    },
+    {
+      id: 'glasses',
+      label: 'Glasses Collected & Donated',
+      value: '66',
+      accent: '#c65d07',
+      summary: 'Eyeglasses gathered, sorted, and donated to support access to vision care.',
+      breakdown: [
+        'Pairs donated: 26',
+        'Pairs distributed: 40',
+      ]
+    },
+    {
+      id: 'funds',
+      label: 'Money Fundraised',
+      value: '$200',
+      accent: '#e6b800',
+      summary: 'Funds raised to support outreach, screenings, and related mission costs.',
+      breakdown: [
+        'Door-to-door fundraising: 200 USD',
+      ]
     }
   ];
 
@@ -97,6 +135,57 @@ const AboutUs = () => {
     );
   };
 
+  const ImpactCard = ({ stat, index }) => {
+    const [cardVisible, setCardVisible] = useState(false);
+    const ref = React.useRef(null);
+
+    React.useEffect(() => {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting && !cardVisible) {
+            setTimeout(() => {
+              setCardVisible(true);
+            }, index * 120);
+          }
+        },
+        {
+          threshold: 0.2,
+          rootMargin: '-40px 0px -40px 0px'
+        }
+      );
+
+      if (ref.current) {
+        observer.observe(ref.current);
+      }
+
+      return () => {
+        if (ref.current) {
+          observer.unobserve(ref.current);
+        }
+      };
+    }, [index, cardVisible]);
+
+    return (
+      <button
+        ref={ref}
+        type="button"
+        className={`impact-card ${cardVisible ? 'impact-visible' : ''}`}
+        onClick={() => setActiveImpact(stat)}
+        style={{ '--impact-accent': stat.accent }}
+      >
+        <div
+          className="impact-card-glow"
+          style={{ background: `radial-gradient(circle at top right, ${stat.accent}26, transparent 58%)` }}
+        ></div>
+        <div className="impact-card-topline"></div>
+        <div className="impact-card-value">{stat.value}</div>
+        <div className="impact-card-label">{stat.label}</div>
+        <div className="impact-card-summary">{stat.summary}</div>
+        <div className="impact-card-footer">Click for breakdown</div>
+      </button>
+    );
+  };
+
   return (
     <div className={`about-us-container ${isVisible ? 'visible' : ''}`}>
       {/* Background diagonal stripes */}
@@ -112,6 +201,23 @@ const AboutUs = () => {
         <div className="section-title" style={{textAlign: 'center', fontSize: 'clamp(3rem, 8vw, 6rem)'}}>
             About Us
         </div>
+
+        <div id="impact" className="impact-section">
+          <div className="impact-header">
+            <p className="impact-eyebrow">Impact</p>
+            <h2 className="impact-title">Our measurable reach</h2>
+            <p className="impact-description">
+              These numbers will track the people we screen, the glasses we collect and donate, and the funds we raise.
+            </p>
+          </div>
+
+          <div className="impact-grid">
+            {impactStats.map((stat, index) => (
+              <ImpactCard key={stat.id} stat={stat} index={index} />
+            ))}
+          </div>
+        </div>
+
         {sections.map((section, index) => (
           <SectionCard 
             key={section.id}
@@ -120,6 +226,208 @@ const AboutUs = () => {
           />
         ))}
       </div>
+
+      <Dialog
+        open={Boolean(activeImpact)}
+        onClose={() => setActiveImpact(null)}
+        maxWidth="md"
+        fullWidth
+        scroll="paper"
+        BackdropProps={{
+          sx: {
+            background: 'linear-gradient(135deg, rgba(10, 12, 14, 0.62), rgba(32, 26, 18, 0.5))',
+            backdropFilter: 'blur(10px) saturate(120%)'
+          }
+        }}
+        PaperProps={{
+          sx: {
+            borderRadius: { xs: '20px', sm: '28px' },
+            background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 245, 240, 0.96))',
+            boxShadow: '0 36px 100px rgba(0, 0, 0, 0.34)',
+            border: '1px solid rgba(255, 255, 255, 0.52)',
+            overflow: 'hidden',
+            position: 'relative'
+          }
+        }}
+      >
+        {activeImpact && (
+          <DialogContent
+            sx={{
+              p: { xs: 2, sm: 4 },
+              position: 'relative',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                inset: 0,
+                background:
+                  'radial-gradient(circle at top right, rgba(198, 93, 7, 0.14), transparent 34%), radial-gradient(circle at bottom left, rgba(45, 125, 125, 0.12), transparent 30%), linear-gradient(135deg, rgba(198, 93, 7, 0.09), transparent 62%)',
+                pointerEvents: 'none'
+              },
+              '&::after': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '6px',
+                background: 'linear-gradient(90deg, #2d7d7d, #c65d07, #e6b800)',
+                pointerEvents: 'none'
+              }
+            }}
+          >
+            <IconButton
+              onClick={() => setActiveImpact(null)}
+              aria-label="Close impact details"
+              sx={{
+                position: 'absolute',
+                top: 12,
+                right: 12,
+                zIndex: 2,
+                width: 42,
+                height: 42,
+                border: '1px solid rgba(0, 0, 0, 0.08)',
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                boxShadow: '0 10px 25px rgba(0, 0, 0, 0.12)',
+                fontSize: '1.2rem',
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.98)'
+                }
+              }}
+            >
+              ×
+            </IconButton>
+
+            <Typography
+              component="p"
+              sx={{
+                position: 'relative',
+                zIndex: 1,
+                mb: 1,
+                textTransform: 'uppercase',
+                letterSpacing: '0.26em',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                color: activeImpact.accent,
+                fontFamily: 'Segoe UI, sans-serif'
+              }}
+            >
+              Impact breakdown
+            </Typography>
+
+            <Typography
+              component="h3"
+              sx={{
+                position: 'relative',
+                zIndex: 1,
+                m: 0,
+                fontFamily: 'DM Serif Text, serif',
+                fontSize: 'clamp(2rem, 5vw, 3.2rem)',
+                lineHeight: 1.05,
+                color: '#2d2d2d'
+              }}
+            >
+              {activeImpact.label}
+            </Typography>
+
+            <Typography
+              component="p"
+              sx={{
+                position: 'relative',
+                zIndex: 1,
+                mt: 2,
+                mb: 2,
+                fontFamily: 'Segoe UI, sans-serif',
+                fontSize: '1.04rem',
+                lineHeight: 1.7,
+                color: '#4a4a4a',
+                maxWidth: '56ch'
+              }}
+            >
+              {activeImpact.summary}
+            </Typography>
+
+            <Box
+              sx={{
+                position: 'relative',
+                zIndex: 1,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minWidth: 160,
+                px: 2,
+                py: 1,
+                borderRadius: '999px',
+                background: 'linear-gradient(135deg, rgba(198, 93, 7, 0.14), rgba(255, 255, 255, 0.92))',
+                border: '1px solid rgba(198, 93, 7, 0.12)',
+                boxShadow: '0 10px 22px rgba(0, 0, 0, 0.08)',
+                fontFamily: 'DM Serif Text, serif',
+                fontSize: '1.7rem',
+                color: '#2d2d2d',
+                mb: 2
+              }}
+            >
+              {activeImpact.value}
+            </Box>
+
+            <Box
+              sx={{
+                position: 'relative',
+                zIndex: 1,
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))' },
+                gap: 1.2
+              }}
+            >
+              {activeImpact.breakdown.map((item) => (
+                <Box
+                  key={item}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 1,
+                    p: '0.95rem 1rem',
+                    borderRadius: '1rem',
+                    background: 'rgba(255, 255, 255, 0.74)',
+                    border: '1px solid rgba(0, 0, 0, 0.06)',
+                    boxShadow: '0 8px 18px rgba(0, 0, 0, 0.05)',
+                    fontFamily: 'Segoe UI, sans-serif',
+                    fontSize: '1rem',
+                    color: '#333',
+                    lineHeight: 1.5
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: 10,
+                      height: 10,
+                      borderRadius: '999px',
+                      background: activeImpact.accent,
+                      mt: '0.45rem',
+                      flex: '0 0 auto'
+                    }}
+                  />
+                  <span>{item}</span>
+                </Box>
+              ))}
+            </Box>
+
+            <Typography
+              component="p"
+              sx={{
+                position: 'relative',
+                zIndex: 1,
+                mt: 2,
+                mb: 0,
+                fontFamily: 'Segoe UI, sans-serif',
+                fontSize: '0.92rem',
+                lineHeight: 1.6,
+                color: '#666'
+              }}
+            >
+            </Typography>
+          </DialogContent>
+        )}
+      </Dialog>
 
       <style jsx>{`
         .about-us-container {
@@ -214,6 +522,136 @@ const AboutUs = () => {
           max-width: 1000px;
           margin: 0 auto;
         }
+
+        .impact-section {
+          background: rgba(255, 255, 255, 0.88);
+          backdrop-filter: blur(12px);
+          border-radius: 2rem;
+          padding: 2.5rem;
+          border: 1px solid rgba(255, 255, 255, 0.35);
+          box-shadow: 0 14px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .impact-header {
+          text-align: center;
+          max-width: 760px;
+          margin: 0 auto 1.75rem;
+        }
+
+        .impact-eyebrow {
+          margin: 0 0 0.75rem;
+          text-transform: uppercase;
+          letter-spacing: 0.22em;
+          font-size: 0.78rem;
+          font-weight: 700;
+          color: #c65d07;
+          font-family: 'Segoe UI', sans-serif;
+        }
+
+        .impact-title {
+          margin: 0;
+          font-family: 'DM Serif Text', Times, serif;
+          font-size: clamp(2rem, 4vw, 3rem);
+          color: #2d2d2d;
+          line-height: 1.1;
+        }
+
+        .impact-description {
+          margin: 1rem auto 0;
+          font-family: 'Segoe UI', sans-serif;
+          font-size: clamp(1rem, 2vw, 1.1rem);
+          line-height: 1.7;
+          color: #4a4a4a;
+        }
+
+        .impact-grid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 1rem;
+        }
+
+        .impact-card {
+          position: relative;
+          padding: 1.75rem 1.5rem;
+          border: 0;
+          border-radius: 1.5rem;
+          background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 248, 248, 0.9));
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+          cursor: pointer;
+          text-align: left;
+          overflow: hidden;
+          transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+          opacity: 0;
+          transform: translateY(28px) scale(0.96);
+          filter: blur(6px);
+        }
+
+        .impact-card.impact-visible {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+          filter: blur(0);
+        }
+
+        .impact-card:hover {
+          transform: translateY(-6px) scale(1.01);
+          box-shadow: 0 18px 45px rgba(0, 0, 0, 0.14);
+        }
+
+        .impact-card-glow {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+        }
+
+        .impact-card-topline {
+          width: 56px;
+          height: 4px;
+          border-radius: 999px;
+          background: var(--impact-accent);
+          margin-bottom: 1.2rem;
+          position: relative;
+          z-index: 1;
+        }
+
+        .impact-card-value {
+          position: relative;
+          z-index: 1;
+          font-family: 'DM Serif Text', serif;
+          font-size: clamp(2.2rem, 5vw, 3.2rem);
+          line-height: 1;
+          color: #2d2d2d;
+          margin-bottom: 0.75rem;
+        }
+
+        .impact-card-label {
+          position: relative;
+          z-index: 1;
+          font-family: 'Segoe UI', sans-serif;
+          font-weight: 700;
+          font-size: 1rem;
+          color: #2d2d2d;
+          margin-bottom: 0.8rem;
+        }
+
+        .impact-card-summary {
+          position: relative;
+          z-index: 1;
+          font-family: 'Segoe UI', sans-serif;
+          font-size: 0.98rem;
+          line-height: 1.6;
+          color: #555;
+          margin-bottom: 1.4rem;
+        }
+
+        .impact-card-footer {
+          position: relative;
+          z-index: 1;
+          font-family: 'Segoe UI', sans-serif;
+          font-size: 0.9rem;
+          font-weight: 700;
+          color: var(--impact-accent);
+        }
+
 
         .section-card {
           position: relative;
@@ -447,6 +885,15 @@ const AboutUs = () => {
 
           .content-wrapper {
             gap: 2rem;
+          }
+
+          .impact-section {
+            padding: 1.5rem;
+            border-radius: 1.5rem;
+          }
+
+          .impact-grid {
+            grid-template-columns: 1fr;
           }
 
           .section-card {

@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 
 function Login() {
@@ -10,8 +10,17 @@ function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login, signInWithGoogle } = useAuth();
+  const { login, signInWithGoogle, logout } = useAuth();
   const navigate = useNavigate();
+
+  async function assertAdminAccess(user) {
+    const userDoc = await getDoc(doc(db, 'users', user.uid));
+
+    if (!userDoc.exists() || !userDoc.data()?.isAdmin) {
+      await logout();
+      throw new Error('admin-access-denied');
+    }
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -19,10 +28,13 @@ function Login() {
     try {
       setError('');
       setLoading(true);
-      await login(email, password);
-      navigate('/volunteers');
+      const userCredential = await login(email, password);
+      await assertAdminAccess(userCredential.user);
+      navigate('/upcoming');
     } catch (error) {
-      setError('Failed to log in. Please check your credentials.');
+      setError(error.message === 'admin-access-denied'
+        ? 'This login is for admins only.'
+        : 'Failed to log in. Please check your credentials.');
       console.error(error);
     }
 
@@ -48,10 +60,13 @@ function Login() {
         email: user.email,
         createdAt: new Date().toISOString()
       }, { merge: true }); // merge: true to not overwrite existing data
-      
-      navigate('/volunteers');
+
+      await assertAdminAccess(user);
+      navigate('/upcoming');
     } catch (error) {
-      setError('Failed to sign in with Google.');
+      setError(error.message === 'admin-access-denied'
+        ? 'This login is for admins only.'
+        : 'Failed to sign in with Google.');
       console.error(error);
       setLoading(false);
     }
@@ -87,7 +102,7 @@ function Login() {
           color: '#2d2d2d',
           textAlign: 'center'
         }}>
-          Welcome Back
+          Admin Login
         </h1>
         
         <p style={{
@@ -97,7 +112,7 @@ function Login() {
           textAlign: 'center',
           marginBottom: '2rem'
         }}>
-          Sign in to access volunteer resources
+          Sign in to manage upcoming events
         </p>
 
         {error && (
@@ -274,19 +289,7 @@ function Login() {
           fontSize: '0.95rem',
           color: '#666'
         }}>
-          Don't have an account?{' '}
-          <Link
-            to="/signup"
-            style={{
-              color: '#c65d07',
-              textDecoration: 'none',
-              fontWeight: 600
-            }}
-            onMouseEnter={(e) => e.target.style.textDecoration = 'underline'}
-            onMouseLeave={(e) => e.target.style.textDecoration = 'none'}
-          >
-            Sign up
-          </Link>
+          Admin access only.
         </p>
       </motion.div>
     </div>

@@ -577,7 +577,7 @@ const PublicationCard = ({ image, title, description, link, index = 0 }) => {
         .pub-image img {
           width: 100%;
           height: 100%;
-          object-fit: cover;
+          object-fit: contain;
           object-position: center;
           display: block;
         }
@@ -704,7 +704,7 @@ const PublicationCard = ({ image, title, description, link, index = 0 }) => {
           .pub-image img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
             display: block;
           }
 
@@ -776,13 +776,18 @@ const Partnerships = () => {
     }
   ];
 
-  // Example publications - replace with actual data
   const publications = [
     {
       image: "/imgs/pub_1.png",
       title: "Rotary Club of Guntur Vikas - Guntar Vikas (Aug 2025)",
       description: "The Rotary Club of Guntur (one of our partners) has published the August 2025 article on one of the eye camps we have done in collabaration with them.",
       link: "/public/guntur_vikas_aug_2025.pdf"
+    },
+    {
+      image: "/public/imgs/SidekickPublication.png",
+      title: "Coppell Student Media - Seeing a Brighter Future as RecycleSpecs Brings Optical Health to Marginalized Communities (Sep 2025)",
+      description: "We were published in our school newspaper for our door-to-door glasses collection and the positive community impact it created.",
+      link: "https://coppellstudentmedia.com/141106/studentlife/seeing-a-brighter-future-as-recyclespecs-brings-optical-health-to-marginalized-communities/"
     },
   ];
 

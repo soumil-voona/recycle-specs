@@ -21,12 +21,16 @@ const Navbar = () => {
     { name: 'About', color: '#c65d07', angle: '135deg' },
     { name: 'Board', color: '#e6b800', angle: '-135deg' },
     { name: 'Events', color: '#5b8b5b', angle: '-45deg' },
+    { name: 'Impact', color: '#3f6b7a', angle: '135deg', hash: 'impact' },
+    { name: 'Upcoming', color: '#8b5ba8', angle: '-135deg', route: '/upcoming' },
+    { name: 'Volunteers', color: '#8b5ba8', angle: '135deg', route: '/volunteers' },
     { name: 'Partnerships', color: '#4a4a4a', angle: '45deg' },
     // { name: 'Easter', color: '#d4a574', angle: '45deg', route: '/easter' },
-    { name: 'Volunteers', color: '#8b5ba8', angle: '135deg', route: '/volunteers' }
   ];
 
-  const handleNavigation = (itemName, route) => {
+  const handleNavigation = (itemName, route, hash) => {
+    const targetId = hash || itemName.toLowerCase();
+
     // If there's a route, navigate to that route
     if (route) {
       navigate(route);
@@ -38,7 +42,6 @@ const Navbar = () => {
       navigate('/');
       // Use setTimeout to allow navigation to complete before scrolling
       setTimeout(() => {
-        const targetId = itemName.toLowerCase();
         const element = document.getElementById(targetId);
         if (element) {
           const navbar = document.querySelector('.navbar-wrapper');
@@ -58,7 +61,6 @@ const Navbar = () => {
     }
 
     // If already on home page, just scroll
-    const targetId = itemName.toLowerCase();
     const element = document.getElementById(targetId);
     if (element) {
       const navbar = document.querySelector('.navbar-wrapper');
@@ -77,10 +79,10 @@ const Navbar = () => {
     }
   };
 
-  const handleMobileNavigation = (itemName, route) => {
+  const handleMobileNavigation = (itemName, route, hash) => {
     setMobileMenuOpen(false);
     setTimeout(() => {
-      handleNavigation(itemName, route);
+      handleNavigation(itemName, route, hash);
     }, 300); // Small delay to allow menu to close
   };
 
@@ -101,7 +103,7 @@ const Navbar = () => {
               className={`nav-tab ${hoveredTab === index ? 'hovered' : ''}`}
               onMouseEnter={() => setHoveredTab(index)}
               onMouseLeave={() => setHoveredTab(null)}
-              onClick={() => handleNavigation(item.name, item.route)}
+              onClick={() => handleNavigation(item.name, item.route, item.hash)}
               style={{
                 '--tab-color': item.color,
                 '--stripe-angle': item.angle,
@@ -146,7 +148,7 @@ const Navbar = () => {
                   '--item-color': item.color,
                   '--item-delay': `${index * 0.1}s`
                 }}
-                onClick={() => handleMobileNavigation(item.name, item.route)}
+                onClick={() => handleMobileNavigation(item.name, item.route, item.hash)}
               >
                 <span>{item.name}</span>
                 <div className="mobile-item-stripe"></div>

@@ -9,6 +9,8 @@ import BoardMembers from './sections/BoardMembers'
 import AboutUs from './sections/AboutUs'
 import Partnerships from './sections/Partnerships'
 import PastEvents from './sections/PastEvents'
+import Upcoming from './sections/Upcoming'
+import UpcomingEvent from './sections/UpcomingEvent'
 import Volunteers from './sections/Volunteers'
 import Easter from './sections/Easter'
 import Login from './sections/Login'
@@ -273,6 +275,9 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/upcoming" element={<Upcoming />} />
+        <Route path="/upcoming/:eventPath" element={<UpcomingEvent />} />
+        <Route path="/community" element={<Navigate to="/upcoming" replace />} />
         {/* <Route path="/easter" element={<Easter />} /> */}
         <Route 
           path="/volunteers" 
