@@ -319,7 +319,9 @@ function App() {
       
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<Navigate to="/volunteer-login" replace />} />
+        <Route path="/volunteer-login" element={<Login mode="volunteer" />} />
+        <Route path="/event-login" element={<Login mode="event" />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/upcoming" element={<Upcoming />} />
         <Route path="/upcoming/:eventPath" element={<UpcomingEvent />} />
@@ -328,7 +330,7 @@ function App() {
         <Route 
           path="/volunteers" 
           element={
-            <ProtectedRoute message="Log in to access the volunteer dashboard.">
+            <ProtectedRoute message="Log in to access the volunteer dashboard." redirectTo="/volunteer-login">
               <Volunteers />
             </ProtectedRoute>
           } 

@@ -318,7 +318,7 @@ function Upcoming() {
           ) : (
             <button
               type="button"
-              onClick={() => navigate('/login')}
+              onClick={() => navigate('/event-login')}
               style={{
                 padding: '0.5rem 1.5rem',
                 background: '#f5f5f5',
@@ -332,7 +332,7 @@ function Upcoming() {
                 transition: 'all 0.3s ease'
               }}
             >
-              Sign in
+              Admin Login
             </button>
           )}
         </motion.div>

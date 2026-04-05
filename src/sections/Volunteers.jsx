@@ -291,6 +291,37 @@ function Volunteers() {
     }
   }
 
+  async function handleDeleteEvent(eventId) {
+    if (!currentUser || !userData?.isAdmin) {
+      return;
+    }
+
+    if (!window.confirm('Are you sure you want to delete this volunteer event? This will also remove all related volunteer signups.')) {
+      return;
+    }
+
+    try {
+      const signupsForEventQuery = query(
+        collection(db, 'volunteers'),
+        where('eventId', '==', eventId)
+      );
+      const signupsSnapshot = await getDocs(signupsForEventQuery);
+
+      await Promise.all(signupsSnapshot.docs.map((signupDoc) => deleteDoc(signupDoc.ref)));
+      await deleteDoc(doc(db, 'events', eventId));
+
+      setEvents((prevEvents) => prevEvents.filter((event) => event.id !== eventId));
+      setVolunteerSignups((prevSignups) => {
+        const nextSignups = { ...prevSignups };
+        delete nextSignups[eventId];
+        return nextSignups;
+      });
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      alert('Failed to delete event. Please try again.');
+    }
+  }
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -537,6 +568,34 @@ function Volunteers() {
                               ? 'Event Full' 
                               : 'Sign Up'}
                       </button>
+
+                      {showAdminPanel && userData?.isAdmin && (
+                        <button
+                          onClick={() => handleDeleteEvent(event.id)}
+                          style={{
+                            width: '100%',
+                            padding: '0.75rem',
+                            marginTop: '0.75rem',
+                            background: '#b91c1c',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '0.5rem',
+                            fontSize: '0.95rem',
+                            fontWeight: 600,
+                            fontFamily: "'Segoe UI', sans-serif",
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.target.style.background = '#991b1b';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.background = '#b91c1c';
+                          }}
+                        >
+                          Delete Event
+                        </button>
+                      )}
                     </div>
                   </motion.div>
                 );

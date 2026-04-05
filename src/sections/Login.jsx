@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 
-function Login() {
+function Login({ mode = 'volunteer' }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -14,6 +14,8 @@ function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const loginMessage = location.state?.message;
+
+  const isEventLogin = mode === 'event';
 
   async function assertAdminAccess(user) {
     const userDoc = await getDoc(doc(db, 'users', user.uid));
@@ -31,8 +33,17 @@ function Login() {
       setError('');
       setLoading(true);
       const userCredential = await login(email, password);
-      await assertAdminAccess(userCredential.user);
-      navigate('/upcoming');
+
+      if (isEventLogin) {
+        await assertAdminAccess(userCredential.user);
+      }
+
+      await setDoc(doc(db, 'users', userCredential.user.uid), {
+        email: userCredential.user.email,
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+
+      navigate(isEventLogin ? '/upcoming' : '/volunteers');
     } catch (error) {
       setError(error.message === 'admin-access-denied'
         ? 'This login is for admins only.'
@@ -63,8 +74,13 @@ function Login() {
         createdAt: new Date().toISOString()
       }, { merge: true }); // merge: true to not overwrite existing data
 
-      await assertAdminAccess(user);
-      navigate('/upcoming');
+      if (isEventLogin) {
+        await assertAdminAccess(user);
+        navigate('/upcoming');
+        return;
+      }
+
+      navigate('/volunteers');
     } catch (error) {
       setError(error.message === 'admin-access-denied'
         ? 'This login is for admins only.'
@@ -104,7 +120,7 @@ function Login() {
           color: '#2d2d2d',
           textAlign: 'center'
         }}>
-          Admin Login
+          {isEventLogin ? 'Event Admin Login' : 'Volunteer Login'}
         </h1>
         
         <p style={{
@@ -114,7 +130,9 @@ function Login() {
           textAlign: 'center',
           marginBottom: '2rem'
         }}>
-          Sign in to manage upcoming events
+          {isEventLogin
+            ? 'Admins only. Sign in to manage events.'
+            : 'Sign in to access your volunteer dashboard'}
         </p>
 
         {loginMessage && (
@@ -312,7 +330,51 @@ function Login() {
           fontSize: '0.95rem',
           color: '#666'
         }}>
-          Admin access only.
+          {isEventLogin ? (
+            <>
+              Need the volunteer login?{' '}
+              <span
+                role="button"
+                tabIndex={0}
+                onClick={() => navigate('/volunteer-login')}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    navigate('/volunteer-login');
+                  }
+                }}
+                style={{
+                  color: '#c65d07',
+                  textDecoration: 'none',
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
+              >
+                Go to volunteer login
+              </span>
+            </>
+          ) : (
+            <>
+              Need admin access for events?{' '}
+              <span
+                role="button"
+                tabIndex={0}
+                onClick={() => navigate('/event-login')}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    navigate('/event-login');
+                  }
+                }}
+                style={{
+                  color: '#c65d07',
+                  textDecoration: 'none',
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
+              >
+                Go to event login
+              </span>
+            </>
+          )}
         </p>
       </motion.div>
     </div>
