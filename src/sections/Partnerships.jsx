@@ -784,7 +784,7 @@ const Partnerships = () => {
       link: "/public/guntur_vikas_aug_2025.pdf"
     },
     {
-      image: "/public/imgs/SidekickPublication.png",
+      image: "/imgs/SidekickPublication.png",
       title: "Coppell Student Media - Seeing a Brighter Future as RecycleSpecs Brings Optical Health to Marginalized Communities (Sep 2025)",
       description: "We were published in our school newspaper for our door-to-door glasses collection and the positive community impact it created.",
       link: "https://coppellstudentmedia.com/141106/studentlife/seeing-a-brighter-future-as-recyclespecs-brings-optical-health-to-marginalized-communities/"
@@ -829,7 +829,7 @@ const Partnerships = () => {
       </div>
 
       {/* Publications Section */}
-      <div className="publications-section" aria-labelledby="publications-title">
+      <div id="publications" className="publications-section" aria-labelledby="publications-title">
         <div className="publications-header">
           <h2 id="publications-title" className="section-title small">Publications</h2>
           <p className="section-subtitle">Where RecycleSpecs has been featured — click to read the coverage.</p>

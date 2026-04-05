@@ -1081,7 +1081,7 @@ const PastEvents = () => {
   ];
 
   return (
-    <div id="impact" className={`past-events-container ${isVisible ? 'visible' : ''}`}>
+    <div className={`past-events-container ${isVisible ? 'visible' : ''}`}>
       {/* Background diagonal stripes */}
       <div className="bg-decoration">
         <div className="bg-stripe bg-stripe-1"></div>

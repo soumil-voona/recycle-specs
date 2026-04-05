@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { useInView } from 'framer-motion'
 import { useRef, useState, useEffect } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { Analytics } from '@vercel/analytics/react';
 import Home from './sections/Home'
 import Navbar from './sections/Navbar'
@@ -147,6 +147,52 @@ const HomeSection = ({ children }) => {
 
 // HomePage component - wraps all the main landing page sections
 const HomePage = () => {
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const targetId = location.state?.scrollTo
+    const shouldScrollToTop = location.state?.scrollToTop
+
+    if (!targetId && !shouldScrollToTop) {
+      return
+    }
+
+    const scrollToTarget = () => {
+      if (shouldScrollToTop) {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        })
+
+        navigate(location.pathname, { replace: true, state: null })
+        return
+      }
+
+      const element = document.getElementById(targetId)
+
+      if (!element) {
+        return
+      }
+
+      const navbar = document.querySelector('.navbar-wrapper')
+      const isMobile = window.innerWidth <= 900
+      const navbarHeight = navbar ? navbar.offsetHeight : (isMobile ? 60 : 75)
+      const extraPadding = isMobile ? 6 : 20
+      const offsetPosition = element.getBoundingClientRect().top + window.scrollY - navbarHeight - extraPadding
+
+      window.scrollTo({
+        top: Math.max(offsetPosition, 0),
+        behavior: 'smooth'
+      })
+
+      navigate(location.pathname, { replace: true, state: null })
+    }
+
+    const timer = window.setTimeout(scrollToTarget, 0)
+    return () => window.clearTimeout(timer)
+  }, [location.pathname, location.state, navigate])
+
   return (
     <motion.div 
       style={{ 
@@ -282,7 +328,7 @@ function App() {
         <Route 
           path="/volunteers" 
           element={
-            <ProtectedRoute>
+            <ProtectedRoute message="Log in to access the volunteer dashboard.">
               <Volunteers />
             </ProtectedRoute>
           } 

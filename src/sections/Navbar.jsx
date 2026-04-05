@@ -17,15 +17,13 @@ const Navbar = () => {
   }, []);
 
   const navItems = [
-    { name: 'Home', color: '#2d7d7d', angle: '45deg' },
     { name: 'About', color: '#c65d07', angle: '135deg' },
     { name: 'Board', color: '#e6b800', angle: '-135deg' },
     { name: 'Events', color: '#5b8b5b', angle: '-45deg' },
-    { name: 'Impact', color: '#3f6b7a', angle: '135deg', hash: 'impact' },
+    { name: 'Partnerships', color: '#4a4a4a', angle: '45deg' },
+    { name: 'Publications', color: '#2d7d7d', angle: '135deg', hash: 'publications' },
     { name: 'Upcoming', color: '#8b5ba8', angle: '-135deg', route: '/upcoming' },
     { name: 'Volunteers', color: '#8b5ba8', angle: '135deg', route: '/volunteers' },
-    { name: 'Partnerships', color: '#4a4a4a', angle: '45deg' },
-    // { name: 'Easter', color: '#d4a574', angle: '45deg', route: '/easter' },
   ];
 
   const handleNavigation = (itemName, route, hash) => {
@@ -39,24 +37,7 @@ const Navbar = () => {
 
     // If not on home page, navigate to home first
     if (location.pathname !== '/') {
-      navigate('/');
-      // Use setTimeout to allow navigation to complete before scrolling
-      setTimeout(() => {
-        const element = document.getElementById(targetId);
-        if (element) {
-          const navbar = document.querySelector('.navbar-wrapper');
-          const isMobile = window.innerWidth <= 900;
-          const navbarHeight = navbar ? navbar.offsetHeight : (isMobile ? 60 : 75);
-          const extraPadding = isMobile ? 6 : 20;
-          const elementPosition = element.offsetTop;
-          const offsetPosition = elementPosition - navbarHeight - extraPadding;
-
-          window.scrollTo({
-            top: offsetPosition,
-            behavior: 'smooth'
-          });
-        }
-      }, 100);
+      navigate('/', { state: { scrollTo: targetId } });
       return;
     }
 
@@ -67,11 +48,10 @@ const Navbar = () => {
       const isMobile = window.innerWidth <= 900;
       const navbarHeight = navbar ? navbar.offsetHeight : (isMobile ? 60 : 75);
       const extraPadding = isMobile ? 6 : 20;
-      const elementPosition = element.offsetTop;
-      const offsetPosition = elementPosition - navbarHeight - extraPadding;
+      const offsetPosition = element.getBoundingClientRect().top + window.scrollY - navbarHeight - extraPadding;
 
       window.scrollTo({
-        top: offsetPosition,
+        top: Math.max(offsetPosition, 0),
         behavior: 'smooth'
       });
     } else {
@@ -90,7 +70,17 @@ const Navbar = () => {
     <div className={`navbar-wrapper ${scrolled ? 'scrolled' : ''}`}>
       <div className="nav-container">
         {/* Logo */}
-        <div className="logo-section" onClick={() => navigate('/')}>
+        <div
+          className="logo-section"
+          onClick={() => {
+            if (location.pathname === '/') {
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+              return;
+            }
+
+            navigate('/', { state: { scrollToTop: true } });
+          }}
+        >
           <img src = '/imgs/logo.png' style={{height: '60px'}} />
           <span className="logo-text">RECYCLE SPECS</span>
         </div>

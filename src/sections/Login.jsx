@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -12,6 +12,8 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const { login, signInWithGoogle, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const loginMessage = location.state?.message;
 
   async function assertAdminAccess(user) {
     const userDoc = await getDoc(doc(db, 'users', user.uid));
@@ -114,6 +116,27 @@ function Login() {
         }}>
           Sign in to manage upcoming events
         </p>
+
+        {loginMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            style={{
+              marginBottom: '1.5rem',
+              padding: '0.9rem 1rem',
+              borderRadius: '0.75rem',
+              background: 'linear-gradient(135deg, rgba(45, 125, 125, 0.12), rgba(198, 93, 7, 0.12))',
+              border: '1px solid rgba(45, 125, 125, 0.2)',
+              color: '#234b4b',
+              fontFamily: "'Segoe UI', sans-serif",
+              fontSize: '0.95rem',
+              lineHeight: 1.5,
+              textAlign: 'left'
+            }}
+          >
+            {loginMessage}
+          </motion.div>
+        )}
 
         {error && (
           <motion.div
