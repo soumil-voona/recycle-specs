@@ -3,6 +3,7 @@ import { useInView } from 'framer-motion'
 import { useRef, useState, useEffect } from 'react'
 import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from "@vercel/speed-insights/react"
 import Home from './sections/Home'
 import Navbar from './sections/Navbar'
 import BoardMembers from './sections/BoardMembers'
