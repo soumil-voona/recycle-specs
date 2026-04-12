@@ -401,6 +401,7 @@ function App() {
         }
       `}</style>
       <Analytics />
+      <SpeedInsights />
     </>
   )
 }
