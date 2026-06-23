@@ -129,8 +129,8 @@ function Easter() {
       style={{
         minHeight: '100vh',
         padding: '2rem',
-        paddingTop: '100px',
-        background: 'linear-gradient(135deg, rgba(45, 125, 125, 0.05), rgba(196, 93, 7, 0.05))'
+        paddingTop: '80px',
+        background: 'rgba(45, 125, 125, 0.05)'
       }}
     >
       <motion.div
@@ -227,7 +227,7 @@ function Easter() {
                 display: 'inline-block',
                 width: 'fit-content',
                 padding: '0.65rem 1.2rem',
-                background: 'linear-gradient(135deg, #c65d07, #e6b800)',
+                background: 'var(--rs-orange)',
                 color: '#fff',
                 borderRadius: '0.5rem',
                 textDecoration: 'none',
@@ -507,7 +507,7 @@ function Easter() {
               padding: '0.75rem 1.5rem',
               fontSize: '1rem',
               fontWeight: 600,
-              background: uploading ? '#ccc' : 'linear-gradient(135deg, #c65d07, #e6b800)',
+              background: uploading ? '#ccc' : 'var(--rs-orange)',
               color: '#fff',
               border: 'none',
               borderRadius: '0.5rem',
@@ -552,10 +552,17 @@ function Easter() {
                 fontFamily: "'DM Serif Text', serif",
                 fontSize: '1.3rem',
                 color: '#2e7d32',
-                margin: 0
+                margin: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem'
               }}
             >
-              ✓ Signup Confirmed!
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              Signup Confirmed!
             </h3>
             <p
               style={{

@@ -326,8 +326,8 @@ function Volunteers() {
     <div style={{
       minHeight: '100vh',
       padding: '2rem',
-      paddingTop: '100px',
-      background: 'linear-gradient(135deg, rgba(45, 125, 125, 0.05), rgba(196, 93, 7, 0.05))'
+      paddingTop: '80px',
+      background: 'rgba(45, 125, 125, 0.05)'
     }}>
       <motion.div
         initial={{ opacity: 0, y: 30 }}
@@ -335,8 +335,7 @@ function Volunteers() {
         transition={{ duration: 0.8 }}
         style={{
           maxWidth: '1200px',
-          margin: '0 auto',
-          textAlign: 'center'
+          margin: '0 auto'
         }}
       >
         {/* User info and logout button */}
@@ -346,20 +345,42 @@ function Volunteers() {
           transition={{ delay: 0.2, duration: 0.6 }}
           style={{
             display: 'flex',
-            justifyContent: 'flex-end',
+            justifyContent: 'space-between',
             alignItems: 'center',
-            gap: '1rem',
             marginBottom: '2rem',
-            flexWrap: 'wrap'
+            background: 'white',
+            padding: '1.5rem',
+            borderRadius: '1rem',
+            boxShadow: '0 4px 15px rgba(0,0,0,0.05)',
+            flexWrap: 'wrap',
+            gap: '1rem'
           }}
         >
-          <span style={{
-            fontFamily: "'Segoe UI', sans-serif",
-            fontSize: '0.95rem',
-            color: '#666'
-          }}>
-            Welcome, {userData?.firstName || currentUser?.email}
-          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            {userData?.profilePictureUrl ? (
+              <img 
+                src={userData.profilePictureUrl} 
+                alt="Profile" 
+                style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--rs-orange)' }} 
+              />
+            ) : (
+              <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+              </div>
+            )}
+            <div>
+              <h2 style={{ fontFamily: "'DM Serif Text', serif", fontSize: '1.5rem', margin: 0, color: '#2d2d2d' }}>
+                Welcome, {userData?.firstName || currentUser?.email}
+              </h2>
+              <p style={{ fontFamily: "'Segoe UI', sans-serif", fontSize: '0.9rem', color: '#666', margin: 0 }}>
+                Volunteer Dashboard
+              </p>
+            </div>
+          </div>
+          
           <button
             onClick={handleLogout}
             disabled={loggingOut}
@@ -388,15 +409,213 @@ function Volunteers() {
           </button>
         </motion.div>
 
-        <h1 style={{
-          fontFamily: "'DM Serif Text', serif",
-          fontSize: 'clamp(2.5rem, 5vw, 4rem)',
-          marginBottom: '2rem',
-          color: '#2d2d2d',
-          fontWeight: 700
-        }}>
-          Volunteer With Us
-        </h1>
+        {/* Volunteer Stats Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25, duration: 0.6 }}
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gap: '1.5rem',
+            marginBottom: '2rem'
+          }}
+        >
+          {(() => {
+            const myEvents = events.filter(event => 
+              (volunteerSignups[event.id] || []).some(s => s.uid === currentUser?.uid)
+            );
+            
+            const totalHours = myEvents.reduce((acc, event) => {
+              if (event.startTime && event.endTime) {
+                const start = new Date(`2000-01-01T${event.startTime}`);
+                const end = new Date(`2000-01-01T${event.endTime}`);
+                const diff = (end - start) / (1000 * 60 * 60);
+                return acc + (diff > 0 ? diff : 0);
+              }
+              return acc;
+            }, 0);
+
+            return (
+              <>
+                <div style={{
+                  background: 'white',
+                  padding: '2rem',
+                  borderRadius: '1.5rem',
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '1.5rem'
+                }}>
+                  <div style={{
+                    width: '64px',
+                    height: '64px',
+                    borderRadius: '1rem',
+                    background: 'rgba(45, 125, 125, 0.1)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--rs-teal)'
+                  }}>
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '2.5rem', fontWeight: 800, fontFamily: "'Fraunces', serif", color: 'var(--rs-teal)', lineHeight: 1 }}>
+                      {myEvents.length}
+                    </div>
+                    <div style={{ fontSize: '0.9rem', fontWeight: 600, color: '#666', marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      Events Joined
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{
+                  background: 'white',
+                  padding: '2rem',
+                  borderRadius: '1.5rem',
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '1.5rem'
+                }}>
+                  <div style={{
+                    width: '64px',
+                    height: '64px',
+                    borderRadius: '1rem',
+                    background: 'rgba(198, 93, 7, 0.1)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--rs-orange)'
+                  }}>
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '2.5rem', fontWeight: 800, fontFamily: "'Fraunces', serif", color: 'var(--rs-orange)', lineHeight: 1 }}>
+                      {totalHours.toFixed(1)}
+                    </div>
+                    <div style={{ fontSize: '0.9rem', fontWeight: 600, color: '#666', marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      Total Hours
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{
+                  background: 'white',
+                  padding: '1.5rem 2rem',
+                  borderRadius: '1.5rem',
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  gap: '0.75rem'
+                }}>
+                  <p style={{ margin: 0, fontSize: '0.9rem', color: '#555', lineHeight: 1.4 }}>
+                    Need verification of your volunteer hours for school or work?
+                  </p>
+                  <a
+                    href={`mailto:recycle.specs@gmail.com?subject=Volunteer%20Hours%20Verification%20-%20${userData?.firstName}%20${userData?.lastName}&body=Hello%20RecycleSpecs%20Team,%0D%0A%0D%0AI%20am%20writing%20to%20request%20verification%20for%20my%20${totalHours.toFixed(1)}%20volunteering%20hours.%0D%0A%0D%0AThank%20you!`}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.5rem',
+                      background: 'var(--text-primary)',
+                      color: 'white',
+                      padding: '0.75rem 1.25rem',
+                      borderRadius: '0.75rem',
+                      textDecoration: 'none',
+                      fontSize: '0.9rem',
+                      fontWeight: 600,
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
+                    onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                  >
+                    Request Proof of Hours
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                      <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                  </a>
+                </div>
+              </>
+            );
+          })()}
+        </motion.div>
+
+        {/* Start a Chapter Banner */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.3, duration: 0.6 }}
+          style={{
+            background: 'var(--rs-teal)',
+            borderRadius: '1.5rem',
+            padding: '2.5rem',
+            color: 'white',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '2rem',
+            marginBottom: '3rem',
+            boxShadow: '0 10px 30px rgba(45, 125, 125, 0.3)',
+            position: 'relative',
+            overflow: 'hidden'
+          }}
+        >
+          {/* Decorative background shapes */}
+          <div style={{ position: 'absolute', top: '-50px', right: '-50px', width: '200px', height: '200px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', bottom: '-80px', left: '20%', width: '150px', height: '150px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', pointerEvents: 'none' }} />
+          
+          <div style={{ maxWidth: '600px', position: 'relative', zIndex: 1 }}>
+            <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.2)', padding: '0.25rem 0.75rem', borderRadius: '1rem', fontSize: '0.85rem', fontWeight: 600, fontFamily: "'Inter', sans-serif", letterSpacing: '0.05em', marginBottom: '1rem' }}>
+              GROW THE MOVEMENT
+            </div>
+            <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: '2.5rem', margin: '0 0 1rem 0', lineHeight: 1.1 }}>
+              Start a RecycleSpecs Chapter
+            </h2>
+            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '1.05rem', lineHeight: 1.6, opacity: 0.9, margin: '0 0 1.5rem 0' }}>
+              Want to make a bigger impact? You can start a RecycleSpecs chapter in your school or local community. Help us spread awareness and collect donations right where you live!
+            </p>
+            <a 
+              href="https://forms.gle/AX5TJRwgJe1U5cQE9" 
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                background: 'var(--rs-gold)',
+                color: '#2d2d2d',
+                padding: '0.75rem 1.5rem',
+                borderRadius: '0.75rem',
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: 700,
+                textDecoration: 'none',
+                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 15px rgba(0,0,0,0.15)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 10px rgba(0,0,0,0.1)'; }}
+            >
+              Apply Now
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </a>
+          </div>
+          
+          <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'center', flex: 1 }}>
+            <img src="/imgs/event2.jpg" alt="Start a chapter" style={{ maxWidth: '100%', height: 'auto', maxHeight: '200px', borderRadius: '1rem', boxShadow: '0 8px 25px rgba(0,0,0,0.2)', border: '4px solid rgba(255,255,255,0.2)' }} />
+          </div>
+        </motion.div>
         
         <motion.p
           initial={{ opacity: 0 }}
@@ -409,7 +628,8 @@ function Volunteers() {
             color: '#555',
             marginBottom: '3rem',
             maxWidth: '800px',
-            margin: '0 auto 3rem'
+            margin: '0 auto 3rem',
+            textAlign: 'center'
           }}
         >
           RecycleSpecs is a 501(c)(3) nonprofit organization dedicated to spreading optical awareness internationally. We've helped over 500+ people in India to get access to things such as surgeries, eye checkups, glasses, etc but to truly go international we need YOU to help!
@@ -420,13 +640,13 @@ function Volunteers() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.8 }}
-          style={{ marginTop: '4rem' }}
         >
           <h2 style={{
             fontFamily: "'DM Serif Text', serif",
             fontSize: '2.5rem',
             marginBottom: '2rem',
-            color: '#2d2d2d'
+            color: '#2d2d2d',
+            textAlign: 'center'
           }}>
             Upcoming Events
           </h2>
@@ -435,7 +655,8 @@ function Volunteers() {
             <p style={{
               fontFamily: "'Segoe UI', sans-serif",
               fontSize: '1.1rem',
-              color: '#666'
+              color: '#666',
+              textAlign: 'center'
             }}>
               Loading events...
             </p>
@@ -443,12 +664,13 @@ function Volunteers() {
             <p style={{
               fontFamily: "'Segoe UI', sans-serif",
               fontSize: '1.1rem',
-              color: '#666'
+              color: '#666',
+              textAlign: 'center'
             }}>
               No events available at the moment. Check back soon!
             </p>
           ) : (
-            <div style={{
+            <div className="rs-volunteers__events-grid" style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
               gap: '2rem',
@@ -511,18 +733,18 @@ function Volunteers() {
                         marginBottom: '1rem'
                       }}>
                         <p style={{ marginBottom: '0.5rem' }}>
-                          <strong>📍 Location:</strong> {event.location}
+                          <strong>Location:</strong> {event.location}
                         </p>
                         <p style={{ marginBottom: '0.5rem' }}>
-                          <strong>📅 Date:</strong> {formatEventDate(event.date)}
+                          <strong>Date:</strong> {formatEventDate(event.date)}
                         </p>
                         {event.startTime && event.endTime && (
                           <p style={{ marginBottom: '0.5rem' }}>
-                            <strong>🕒 Time:</strong> {formatEventTime(event.startTime)} - {formatEventTime(event.endTime)}
+                            <strong>Time:</strong> {formatEventTime(event.startTime)} - {formatEventTime(event.endTime)}
                           </p>
                         )}
                         <p style={{ marginBottom: '0.5rem' }}>
-                          <strong>👥 Capacity:</strong> {event.capacity === 'unlimited' 
+                          <strong>Capacity:</strong> {event.capacity === 'unlimited' 
                             ? 'Unlimited' 
                             : `${signupCount}/${event.capacity}`}
                         </p>
@@ -539,31 +761,31 @@ function Volunteers() {
                       </p>
                       
                       <button
-                        onClick={() => handleSignup(event.id)}
-                        disabled={(!isSignedUp && isFull) || isSignedUp || signingUp[event.id]}
+                        onClick={() => isSignedUp ? handleUnsignup(event.id) : handleSignup(event.id)}
+                        disabled={(!isSignedUp && isFull) || signingUp[event.id]}
                         style={{
                           width: '100%',
                           padding: '0.75rem',
                           background: isSignedUp 
-                            ? '#999' 
+                            ? '#d32f2f' 
                             : isFull 
                               ? '#ccc' 
-                              : 'linear-gradient(135deg, #c65d07, #e6b800)',
+                              : 'var(--rs-orange)',
                           color: 'white',
                           border: 'none',
                           borderRadius: '0.5rem',
                           fontSize: '1rem',
                           fontWeight: 600,
                           fontFamily: "'Segoe UI', sans-serif",
-                          cursor: ((!isSignedUp && isFull) || isSignedUp || signingUp[event.id]) ? 'not-allowed' : 'pointer',
+                          cursor: ((!isSignedUp && isFull) || signingUp[event.id]) ? 'not-allowed' : 'pointer',
                           transition: 'all 0.3s ease',
-                          opacity: ((!isSignedUp && isFull) || isSignedUp) ? 0.85 : 1
+                          opacity: (!isSignedUp && isFull) ? 0.85 : 1
                         }}
                       >
                         {signingUp[event.id] 
-                          ? 'Signing up...'
+                          ? 'Processing...'
                           : isSignedUp 
-                            ? 'Signed Up' 
+                            ? 'Cancel Signup' 
                             : isFull 
                               ? 'Event Full' 
                               : 'Sign Up'}
@@ -947,7 +1169,7 @@ function Volunteers() {
                 style={{
                   width: '100%',
                   padding: '1rem',
-                  background: uploading ? '#ccc' : 'linear-gradient(135deg, #c65d07, #e6b800)',
+                  background: uploading ? '#ccc' : 'var(--rs-orange)',
                   color: 'white',
                   border: 'none',
                   borderRadius: '0.75rem',
@@ -975,6 +1197,27 @@ function Volunteers() {
           </motion.div>
         )}
       </motion.div>
+      <style>{`
+        @media (max-width: 768px) {
+          .rs-volunteers__events-grid {
+            display: flex !important;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            padding-bottom: 2rem;
+            margin-left: -2rem;
+            margin-right: -2rem;
+            padding-left: 2rem;
+            padding-right: 2rem;
+            gap: 1.5rem !important;
+            scrollbar-width: none;
+          }
+          .rs-volunteers__events-grid::-webkit-scrollbar { display: none; }
+          .rs-volunteers__events-grid > div {
+            flex: 0 0 85%;
+            scroll-snap-align: center;
+          }
+        }
+      `}</style>
     </div>
   )
 }

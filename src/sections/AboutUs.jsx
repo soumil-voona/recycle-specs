@@ -1,941 +1,511 @@
-import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, IconButton, Typography, Box } from '@mui/material';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, useInView } from 'motion/react';
+import { Dialog, DialogContent, IconButton } from '@mui/material';
 
-const AboutUs = () => {
-  // Removed hoveredSection state - using pure CSS hover now
-  const [isVisible, setIsVisible] = useState(false);
-  const [activeImpact, setActiveImpact] = useState(null);
+/* ─── Impact stats with modal ─── */
+const impactData = [
+  {
+    id: 'screened',
+    value: '595',
+    suffix: '+',
+    label: 'People Screened',
+    accent: 'var(--rs-teal)',
+    icon: (
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+        <circle cx="12" cy="12" r="3"></circle>
+      </svg>
+    ),
+    summary: 'Total number of people who received eye screenings through our community programs.',
+    breakdown: [
+      'Community Children Eye Screening Drive in Guntur, India — 385 children',
+      'Community Senior Citizens Eye Screening Drive in Guntur, India — 210 seniors',
+    ],
+  },
+  {
+    id: 'glasses',
+    value: '66',
+    suffix: '',
+    label: 'Glasses Donated',
+    accent: 'var(--rs-orange)',
+    icon: (
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"></path>
+        <circle cx="12" cy="12" r="3"></circle>
+      </svg>
+    ),
+    summary: 'Eyeglasses gathered, sorted, and donated to those in need.',
+    breakdown: [
+      'Pairs collected & donated: 26',
+      'Pairs distributed at screenings: 40',
+    ],
+  },
+  {
+    id: 'funds',
+    value: '$200',
+    suffix: '',
+    label: 'Funds Raised',
+    accent: 'var(--rs-gold)',
+    icon: (
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+      </svg>
+    ),
+    summary: 'Funds raised to support outreach, screenings, and related mission costs.',
+    breakdown: [
+      'Door-to-door community fundraising: $200 USD',
+    ],
+  },
+  {
+    id: 'communities',
+    value: '3',
+    suffix: '',
+    label: 'Communities Served',
+    accent: 'var(--rs-teal)',
+    icon: (
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+        <circle cx="12" cy="10" r="3"></circle>
+      </svg>
+    ),
+    summary: 'Communities where RecycleSpecs has directly provided vision care services.',
+    breakdown: [
+      'Coppell, Texas — Glasses collection drives',
+      'Guntur, India — Children eye screening',
+      'Guntur, India — Senior citizens screening',
+    ],
+  },
+];
 
+function useCounter(end, duration, start) {
+  const [count, setCount] = useState('0');
   useEffect(() => {
-    const timer = setTimeout(() => setIsVisible(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
+    if (!start) return;
+    const numStr = String(end).replace(/[^0-9]/g, '');
+    const prefix = String(end).replace(/[0-9]/g, '');
+    const num = parseInt(numStr, 10);
+    if (!num) { setCount(end); return; }
+    let startTime = null;
+    const step = (ts) => {
+      if (!startTime) startTime = ts;
+      const progress = Math.min((ts - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(prefix + Math.round(eased * num).toLocaleString());
+      if (progress < 1) requestAnimationFrame(step);
+      else setCount(end);
+    };
+    requestAnimationFrame(step);
+  }, [start, end, duration]);
+  return count;
+}
 
-  const sections = [
-    {
-      id: 'approach',
-      title: 'Our Approach',
-      content: 'Along with hosting fundraisers where all proceeds go to things like organizing optical checkups in marginalized areas, we also aim to collect old lenses and glasses which can be donated to these areas. More information coming soon!',
-      color: '#c65d07',
-      stripeAngle: '45deg'
-    },
-    {
-      id: 'mission',
-      title: 'Our Mission',
-      content: 'To advance optical awareness by empowering and educating communities through accessible resources and outreach.',
-      color: '#2d7d7d',
-      stripeAngle: '-45deg'
-    }
-  ];
-
-  const impactStats = [
-    {
-      id: 'screened',
-      label: 'People Screened',
-      value: '595',
-      accent: '#2d7d7d',
-      summary: 'Total number of people who received eye screenings through our programs.',
-      breakdown: [
-        'Community Children Eye Screening Drive in Guntur, India: 385',
-        'Community Senior Citizens Eye Screening Drive in Guntur, India: 210',
-        'Individual follow-ups: 120'
-      ]
-    },
-    {
-      id: 'glasses',
-      label: 'Glasses Collected & Donated',
-      value: '66',
-      accent: '#c65d07',
-      summary: 'Eyeglasses gathered, sorted, and donated to support access to vision care.',
-      breakdown: [
-        'Pairs donated: 26',
-        'Pairs distributed: 40',
-      ]
-    },
-    {
-      id: 'funds',
-      label: 'Money Fundraised',
-      value: '$200',
-      accent: '#e6b800',
-      summary: 'Funds raised to support outreach, screenings, and related mission costs.',
-      breakdown: [
-        'Door-to-door fundraising: 200 USD',
-      ]
-    }
-  ];
-
-  const SectionCard = ({ section, index }) => {
-    const [sectionVisible, setSectionVisible] = useState(false);
-    const ref = React.useRef(null);
-
-    React.useEffect(() => {
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting && !sectionVisible) {
-            setTimeout(() => {
-              setSectionVisible(true);
-            }, index * 150);
-          }
-        },
-        { 
-          threshold: 0.2,
-          rootMargin: "-50px 0px -50px 0px"
-        }
-      );
-
-      if (ref.current) {
-        observer.observe(ref.current);
-      }
-
-      return () => {
-        if (ref.current) {
-          observer.unobserve(ref.current);
-        }
-      };
-    }, [index, sectionVisible]);
-
-    return (
-      <div
-        ref={ref}
-        className={`section-card ${sectionVisible ? 'section-visible' : ''}`}
-        style={{
-          '--section-color': section.color,
-          '--stripe-angle': section.stripeAngle,
-        }}
-      >
-        {/* Card background stripes */}
-        <div className="card-bg-stripes">
-          <div className="card-bg-stripe stripe-1"></div>
-          <div className="card-bg-stripe stripe-2"></div>
-          <div className="card-bg-stripe stripe-3"></div>
-        </div>
-
-        {/* Section header */}
-        <div className="section-header">
-          <h2 className="section-title">{section.title}</h2>
-          <div className="title-underline"></div>
-        </div>
-
-        {/* Section content */}
-        <div className="section-content">
-          <p className="section-text">{section.content}</p>
-        </div>
-
-        {/* Decorative elements */}
-        <div className="diagonal-accent"></div>
-        <div className="hover-glow"></div>
-        
-        {/* Interactive stripes */}
-        <div className="interactive-stripes">
-          <div className="interactive-stripe stripe-i-1"></div>
-          <div className="interactive-stripe stripe-i-2"></div>
-          <div className="interactive-stripe stripe-i-3"></div>
-        </div>
-      </div>
-    );
-  };
-
-  const ImpactCard = ({ stat, index }) => {
-    const [cardVisible, setCardVisible] = useState(false);
-    const ref = React.useRef(null);
-
-    React.useEffect(() => {
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting && !cardVisible) {
-            setTimeout(() => {
-              setCardVisible(true);
-            }, index * 120);
-          }
-        },
-        {
-          threshold: 0.2,
-          rootMargin: '-40px 0px -40px 0px'
-        }
-      );
-
-      if (ref.current) {
-        observer.observe(ref.current);
-      }
-
-      return () => {
-        if (ref.current) {
-          observer.unobserve(ref.current);
-        }
-      };
-    }, [index, cardVisible]);
-
-    return (
-      <button
-        ref={ref}
-        type="button"
-        className={`impact-card ${cardVisible ? 'impact-visible' : ''}`}
-        onClick={() => setActiveImpact(stat)}
-        style={{ '--impact-accent': stat.accent }}
-      >
-        <div
-          className="impact-card-glow"
-          style={{ background: `radial-gradient(circle at top right, ${stat.accent}26, transparent 58%)` }}
-        ></div>
-        <div className="impact-card-topline"></div>
-        <div className="impact-card-value">{stat.value}</div>
-        <div className="impact-card-label">{stat.label}</div>
-        <div className="impact-card-summary">{stat.summary}</div>
-        <div className="impact-card-footer">Click for breakdown</div>
-      </button>
-    );
-  };
+const ImpactCard = ({ stat, index }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: '-40px' });
+  const animated = useCounter(stat.value, 1800, isInView);
 
   return (
-    <div className={`about-us-container ${isVisible ? 'visible' : ''}`}>
-      {/* Background diagonal stripes */}
-      <div className="bg-decoration">
-        <div className="bg-stripe bg-stripe-1"></div>
-        <div className="bg-stripe bg-stripe-2"></div>
-        <div className="bg-stripe bg-stripe-3"></div>
-        <div className="bg-stripe bg-stripe-4"></div>
-        <div className="bg-stripe bg-stripe-5"></div>
-      </div>
-
-      <div className="content-wrapper">
-        <div className="section-title" style={{textAlign: 'center', fontSize: 'clamp(3rem, 8vw, 6rem)'}}>
-            About Us
-        </div>
-
-        <div id="impact" className="impact-section">
-          <div className="impact-header">
-            <p className="impact-eyebrow">Impact</p>
-            <h2 className="impact-title">Our measurable reach</h2>
-            <p className="impact-description">
-              These numbers will track the people we screen, the glasses we collect and donate, and the funds we raise.
-            </p>
-          </div>
-
-          <div className="impact-grid">
-            {impactStats.map((stat, index) => (
-              <ImpactCard key={stat.id} stat={stat} index={index} />
-            ))}
-          </div>
-        </div>
-
-        {sections.map((section, index) => (
-          <SectionCard 
-            key={section.id}
-            section={section}
-            index={index}
-          />
-        ))}
-      </div>
+    <>
+      <motion.div
+        ref={ref}
+        className="about-impact-card"
+        style={{ '--accent': stat.accent }}
+        initial={{ opacity: 0, y: 40, scale: 0.95 }}
+        animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: index * 0.1 }}
+        whileHover={{ y: -6, transition: { duration: 0.3 } }}
+        onClick={() => setOpen(true)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={e => e.key === 'Enter' && setOpen(true)}
+        aria-label={`${stat.label}: ${stat.value}. Click for details.`}
+      >
+        <motion.div
+          className="about-impact-card__icon"
+          style={{ color: stat.accent }}
+          initial={{ scale: 0, rotate: -20 }}
+          animate={isInView ? { scale: 1, rotate: 0 } : {}}
+          transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1], delay: index * 0.1 + 0.15 }}
+        >
+          {stat.icon}
+        </motion.div>
+        <div className="about-impact-card__num">{animated}{stat.suffix}</div>
+        <div className="about-impact-card__label">{stat.label}</div>
+        <div className="about-impact-card__cta">View Details →</div>
+      </motion.div>
 
       <Dialog
-        open={Boolean(activeImpact)}
-        onClose={() => setActiveImpact(null)}
-        maxWidth="md"
+        open={open}
+        onClose={() => setOpen(false)}
+        maxWidth="sm"
         fullWidth
-        scroll="paper"
-        BackdropProps={{
-          sx: {
-            background: 'linear-gradient(135deg, rgba(10, 12, 14, 0.62), rgba(32, 26, 18, 0.5))',
-            backdropFilter: 'blur(10px) saturate(120%)'
-          }
-        }}
         PaperProps={{
-          sx: {
-            borderRadius: { xs: '20px', sm: '28px' },
-            background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 245, 240, 0.96))',
-            boxShadow: '0 36px 100px rgba(0, 0, 0, 0.34)',
-            border: '1px solid rgba(255, 255, 255, 0.52)',
-            overflow: 'hidden',
-            position: 'relative'
+          style: {
+            borderRadius: '20px',
+            background: 'var(--bg-parchment)',
+            fontFamily: 'Inter, sans-serif',
           }
         }}
       >
-        {activeImpact && (
-          <DialogContent
-            sx={{
-              p: { xs: 2, sm: 4 },
-              position: 'relative',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                inset: 0,
-                background:
-                  'radial-gradient(circle at top right, rgba(198, 93, 7, 0.14), transparent 34%), radial-gradient(circle at bottom left, rgba(45, 125, 125, 0.12), transparent 30%), linear-gradient(135deg, rgba(198, 93, 7, 0.09), transparent 62%)',
-                pointerEvents: 'none'
-              },
-              '&::after': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: '6px',
-                background: 'linear-gradient(90deg, #2d7d7d, #c65d07, #e6b800)',
-                pointerEvents: 'none'
-              }
-            }}
-          >
-            <IconButton
-              onClick={() => setActiveImpact(null)}
-              aria-label="Close impact details"
-              sx={{
-                position: 'absolute',
-                top: 12,
-                right: 12,
-                zIndex: 2,
-                width: 42,
-                height: 42,
-                border: '1px solid rgba(0, 0, 0, 0.08)',
-                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                boxShadow: '0 10px 25px rgba(0, 0, 0, 0.12)',
-                fontSize: '1.2rem',
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.98)'
-                }
-              }}
-            >
-              ×
-            </IconButton>
-
-            <Typography
-              component="p"
-              sx={{
-                position: 'relative',
-                zIndex: 1,
-                mb: 1,
-                textTransform: 'uppercase',
-                letterSpacing: '0.26em',
-                fontSize: '0.78rem',
+        <DialogContent style={{ padding: '2rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+            <div>
+              <div style={{ fontSize: '2rem', marginBottom: '0.25rem', color: stat.accent }}>{stat.icon}</div>
+              <h3 style={{
+                fontFamily: 'Fraunces, Georgia, serif',
+                fontSize: '1.6rem',
                 fontWeight: 700,
-                color: activeImpact.accent,
-                fontFamily: 'Segoe UI, sans-serif'
-              }}
+                color: 'var(--text-primary)',
+                margin: 0,
+              }}>{stat.label}</h3>
+            </div>
+            <IconButton
+              onClick={() => setOpen(false)}
+              style={{ color: 'var(--text-muted)', padding: '4px' }}
+              aria-label="Close"
+              size="small"
             >
-              Impact breakdown
-            </Typography>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+            </IconButton>
+          </div>
 
-            <Typography
-              component="h3"
-              sx={{
-                position: 'relative',
-                zIndex: 1,
-                m: 0,
-                fontFamily: 'DM Serif Text, serif',
-                fontSize: 'clamp(2rem, 5vw, 3.2rem)',
-                lineHeight: 1.05,
-                color: '#2d2d2d'
-              }}
-            >
-              {activeImpact.label}
-            </Typography>
+          <div style={{
+            fontSize: '3rem',
+            fontFamily: 'Fraunces, serif',
+            fontWeight: 900,
+            color: stat.accent,
+            lineHeight: 1,
+            marginBottom: '1rem',
+          }}>{stat.value}{stat.suffix}</div>
 
-            <Typography
-              component="p"
-              sx={{
-                position: 'relative',
-                zIndex: 1,
-                mt: 2,
-                mb: 2,
-                fontFamily: 'Segoe UI, sans-serif',
-                fontSize: '1.04rem',
-                lineHeight: 1.7,
-                color: '#4a4a4a',
-                maxWidth: '56ch'
-              }}
-            >
-              {activeImpact.summary}
-            </Typography>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: 1.7, marginBottom: '1.5rem' }}>
+            {stat.summary}
+          </p>
 
-            <Box
-              sx={{
-                position: 'relative',
-                zIndex: 1,
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                minWidth: 160,
-                px: 2,
-                py: 1,
-                borderRadius: '999px',
-                background: 'linear-gradient(135deg, rgba(198, 93, 7, 0.14), rgba(255, 255, 255, 0.92))',
-                border: '1px solid rgba(198, 93, 7, 0.12)',
-                boxShadow: '0 10px 22px rgba(0, 0, 0, 0.08)',
-                fontFamily: 'DM Serif Text, serif',
-                fontSize: '1.7rem',
-                color: '#2d2d2d',
-                mb: 2
-              }}
-            >
-              {activeImpact.value}
-            </Box>
-
-            <Box
-              sx={{
-                position: 'relative',
-                zIndex: 1,
-                display: 'grid',
-                gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))' },
-                gap: 1.2
-              }}
-            >
-              {activeImpact.breakdown.map((item) => (
-                <Box
-                  key={item}
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: 1,
-                    p: '0.95rem 1rem',
-                    borderRadius: '1rem',
-                    background: 'rgba(255, 255, 255, 0.74)',
-                    border: '1px solid rgba(0, 0, 0, 0.06)',
-                    boxShadow: '0 8px 18px rgba(0, 0, 0, 0.05)',
-                    fontFamily: 'Segoe UI, sans-serif',
-                    fontSize: '1rem',
-                    color: '#333',
-                    lineHeight: 1.5
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: 10,
-                      height: 10,
-                      borderRadius: '999px',
-                      background: activeImpact.accent,
-                      mt: '0.45rem',
-                      flex: '0 0 auto'
-                    }}
-                  />
-                  <span>{item}</span>
-                </Box>
+          <div style={{
+            background: 'rgba(64,58,58,0.04)',
+            borderRadius: '12px',
+            padding: '1rem 1.25rem',
+          }}>
+            <div style={{ fontWeight: 700, fontSize: '0.78rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
+              Breakdown
+            </div>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {stat.breakdown.map((item, i) => (
+                <li key={i} style={{ display: 'flex', gap: '8px', fontSize: '0.92rem', color: 'var(--text-secondary)', alignItems: 'flex-start' }}>
+                  <span style={{ color: stat.accent, fontWeight: 700, flexShrink: 0 }}>•</span>
+                  {item}
+                </li>
               ))}
-            </Box>
-
-            <Typography
-              component="p"
-              sx={{
-                position: 'relative',
-                zIndex: 1,
-                mt: 2,
-                mb: 0,
-                fontFamily: 'Segoe UI, sans-serif',
-                fontSize: '0.92rem',
-                lineHeight: 1.6,
-                color: '#666'
-              }}
-            >
-            </Typography>
-          </DialogContent>
-        )}
+            </ul>
+          </div>
+        </DialogContent>
       </Dialog>
+    </>
+  );
+};
 
-      <style jsx>{`
-        .about-us-container {
+const AboutUs = () => {
+  const headerRef = useRef(null);
+  const isHeaderInView = useInView(headerRef, { once: true, margin: '-60px' });
+  const gridRef = useRef(null);
+  const isGridInView = useInView(gridRef, { once: true, margin: '-60px' });
+
+  return (
+    <section className="rs-about" id="about">
+      {/* Section intro */}
+      <div className="rs-about__header" ref={headerRef}>
+
+        <motion.h2
+          className="section-title"
+          initial={{ opacity: 0, y: 30 }}
+          animate={isHeaderInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+        >
+          Optical Equity,<br /><em style={{ fontStyle: 'italic', color: 'var(--rs-teal)' }}>Driven by Youth</em>
+        </motion.h2>
+        <motion.p
+          className="section-subtitle"
+          initial={{ opacity: 0, y: 24 }}
+          animate={isHeaderInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+        >
+          RecycleSpecs was founded by high school students who believe that quality vision care is a right, not a privilege. We're changing that — one pair of glasses at a time.
+        </motion.p>
+      </div>
+
+      {/* Two-column: image + mission cards */}
+      <div className="rs-about__grid" ref={gridRef}>
+        <motion.div
+          className="rs-about__story"
+          initial={{ opacity: 0, x: -50 }}
+          animate={isGridInView ? { opacity: 1, x: 0 } : {}}
+          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <div className="rs-about__story-img-wrapper">
+            <img src="/imgs/event2.jpg" alt="RecycleSpecs team at a senior citizen eye screening" className="rs-about__story-img" />
+            <div className="rs-about__story-img-caption">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '4px' }}>
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+              Senior Eye Screening — Guntur, India (2025)
+            </div>
+          </div>
+        </motion.div>
+
+        <div className="rs-about__cards">
+          {[
+            {
+              icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>,
+              title: 'Our Mission',
+              content: 'Funding change, transforming vision. We raise awareness, collect glasses, and organize screenings to ensure communities worldwide can access the eye care they deserve.',
+              color: 'var(--rs-teal)',
+              bg: 'rgba(45,125,125,0.06)',
+              border: 'rgba(45,125,125,0.15)',
+            },
+            {
+              icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>,
+              title: 'Our Approach',
+              content: 'We host fundraisers where all proceeds go to organizing screenings in marginalized areas, while collecting old lenses and glasses to donate to communities in need.',
+              color: 'var(--rs-orange)',
+              bg: 'rgba(198,93,7,0.06)',
+              border: 'rgba(198,93,7,0.15)',
+            },
+          ].map((card, i) => (
+            <motion.div
+              key={card.title}
+              className="rs-about__card"
+              style={{ '--accent': card.color, '--bg': card.bg, '--border': card.border }}
+              initial={{ opacity: 0, x: 50 }}
+              animate={isGridInView ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: i * 0.15 + 0.1 }}
+              whileHover={{ x: 6, transition: { duration: 0.3 } }}
+            >
+              <div className="rs-about__card-icon" style={{ color: card.color }}>{card.icon}</div>
+              <div>
+                <h3 className="rs-about__card-title">{card.title}</h3>
+                <p className="rs-about__card-body">{card.content}</p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* Impact Numbers */}
+      <div className="rs-about__impact-section">
+        <motion.div
+          className="rs-about__impact-header"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        >
+
+          <h2 className="section-title" style={{ color: 'var(--text-light)', fontSize: 'clamp(2rem, 4vw, 3rem)' }}>
+            Numbers That<br /><em style={{ fontStyle: 'italic', color: 'var(--rs-gold-light)' }}>Tell Our Story</em>
+          </h2>
+          <p className="section-subtitle" style={{ color: 'rgba(249,244,236,0.65)' }}>
+            Every figure represents a real person who can now see more clearly. Click any card to learn more.
+          </p>
+        </motion.div>
+        <div className="rs-about__impact-grid">
+          {impactData.map((stat, i) => (
+            <ImpactCard key={stat.id} stat={stat} index={i} />
+          ))}
+        </div>
+      </div>
+
+      <style>{`
+        .rs-about {
+          background: var(--bg-parchment);
+          padding: var(--section-pad-y) var(--section-pad-x);
           position: relative;
-          padding: 0rem 2rem;
-          max-width: 1400px;
-          margin: 0 auto;
-          min-height: 80vh;
-          display: flex;
+          overflow: clip;
+        }
+
+        .rs-about__header {
+          max-width: 1280px;
+          margin: 0 auto 3rem;
+        }
+
+        .rs-about__grid {
+          max-width: 1280px;
+          margin: 0 auto 4rem;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: clamp(1.5rem, 4vw, 3rem);
           align-items: center;
-          overflow: hidden;
-          opacity: 0;
-          transform: translateY(50px);
-          transition: all 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
         }
 
-        .about-us-container.visible {
-          opacity: 1;
-          transform: translateY(0);
-        }
-
-        .bg-decoration {
-          position: absolute;
-          inset: 0;
-          overflow: hidden;
-          z-index: 1;
-          opacity: 0.15;
-        }
-
-        .bg-stripe {
-          position: absolute;
-          width: 200%;
-          height: 8vh;
-          left: -50%;
-          animation: bgFloat 12s ease-in-out infinite;
-          transform-origin: center;
-        }
-
-        .bg-stripe-1 {
-          background: linear-gradient(45deg, #403A3A, transparent);
-          top: 15%;
-          transform: rotate(-15deg);
-          animation-delay: 0s;
-        }
-
-        .bg-stripe-2 {
-          background: linear-gradient(45deg, #924014, transparent);
-          top: 30%;
-          transform: rotate(15deg);
-          animation-delay: -2s;
-        }
-
-        .bg-stripe-3 {
-          background: linear-gradient(45deg, #EAC19E, transparent);
-          top: 45%;
-          transform: rotate(-15deg);
-          animation-delay: -4s;
-        }
-
-        .bg-stripe-4 {
-          background: linear-gradient(45deg, #DA9F1A, transparent);
-          top: 60%;
-          transform: rotate(15deg);
-          animation-delay: -6s;
-        }
-
-        .bg-stripe-5 {
-          background: linear-gradient(45deg, #21544E, transparent);
-          top: 75%;
-          transform: rotate(-15deg);
-          animation-delay: -8s;
-        }
-
-        @keyframes bgFloat {
-          0%, 100% { 
-            transform: translateX(-20px) rotate(-15deg); 
-            opacity: 0.1; 
-          }
-          50% { 
-            transform: translateX(20px) rotate(-15deg); 
-            opacity: 0.2; 
-          }
-        }
-
-        .content-wrapper {
+        .rs-about__story-img-wrapper {
           position: relative;
-          z-index: 10;
+          border-radius: 20px;
+          overflow: hidden;
+          box-shadow: var(--shadow-lg);
+        }
+        .rs-about__story-img {
           width: 100%;
+          aspect-ratio: 4/3;
+          object-fit: cover;
+          display: block;
+          transition: transform 0.8s var(--ease-out-expo);
+        }
+        .rs-about__story-img-wrapper:hover .rs-about__story-img {
+          transform: scale(1.05);
+        }
+        .rs-about__story-img-caption {
+          position: absolute;
+          bottom: 0; left: 0; right: 0;
+          background: linear-gradient(0deg, rgba(28,24,21,0.7), transparent);
+          color: white;
+          font-family: 'Inter', sans-serif;
+          font-size: 0.82rem;
+          font-weight: 500;
+          padding: 2rem 1.25rem 1rem;
+          display: flex;
+          gap: 6px;
+          align-items: center;
+        }
+
+        .rs-about__cards {
           display: flex;
           flex-direction: column;
-          gap: 3rem;
-          max-width: 1000px;
-          margin: 0 auto;
+          gap: 1.25rem;
         }
-
-        .impact-section {
-          background: rgba(255, 255, 255, 0.88);
-          backdrop-filter: blur(12px);
-          border-radius: 2rem;
-          padding: 2.5rem;
-          border: 1px solid rgba(255, 255, 255, 0.35);
-          box-shadow: 0 14px 40px rgba(0, 0, 0, 0.12);
-        }
-
-        .impact-header {
-          text-align: center;
-          max-width: 760px;
-          margin: 0 auto 1.75rem;
-        }
-
-        .impact-eyebrow {
-          margin: 0 0 0.75rem;
-          text-transform: uppercase;
-          letter-spacing: 0.22em;
-          font-size: 0.78rem;
-          font-weight: 700;
-          color: #c65d07;
-          font-family: 'Segoe UI', sans-serif;
-        }
-
-        .impact-title {
-          margin: 0;
-          font-family: 'DM Serif Text', Times, serif;
-          font-size: clamp(2rem, 4vw, 3rem);
-          color: #2d2d2d;
-          line-height: 1.1;
-        }
-
-        .impact-description {
-          margin: 1rem auto 0;
-          font-family: 'Segoe UI', sans-serif;
-          font-size: clamp(1rem, 2vw, 1.1rem);
-          line-height: 1.7;
-          color: #4a4a4a;
-        }
-
-        .impact-grid {
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
+        .rs-about__card {
+          background: var(--bg);
+          border: 1px solid var(--border);
+          border-left: 4px solid var(--accent);
+          border-radius: 16px;
+          padding: 1.5rem 1.75rem;
+          display: flex;
           gap: 1rem;
+          align-items: flex-start;
+          cursor: default;
+          transition: box-shadow 0.3s ease;
+        }
+        .rs-about__card:hover {
+          box-shadow: var(--shadow-md);
+        }
+        .rs-about__card-icon {
+          font-size: 1.6rem;
+          flex-shrink: 0;
+          margin-top: 2px;
+        }
+        .rs-about__card-title {
+          font-family: 'Fraunces', Georgia, serif;
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: var(--accent);
+          margin-bottom: 0.5rem;
+        }
+        .rs-about__card-body {
+          font-family: 'Inter', sans-serif;
+          font-size: 0.95rem;
+          color: var(--text-secondary);
+          line-height: 1.75;
+          margin: 0;
         }
 
-        .impact-card {
+        /* Impact section */
+        .rs-about__impact-section {
+          max-width: 1280px;
+          margin: 0 auto;
+          background: var(--bg-dark);
+          border-radius: 28px;
+          padding: clamp(2.5rem, 5vw, 4rem);
+          color: var(--text-light);
           position: relative;
-          padding: 1.75rem 1.5rem;
-          border: 0;
-          border-radius: 1.5rem;
-          background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 248, 248, 0.9));
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-          cursor: pointer;
-          text-align: left;
           overflow: hidden;
-          transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
-          opacity: 0;
-          transform: translateY(28px) scale(0.96);
-          filter: blur(6px);
         }
 
-        .impact-card.impact-visible {
-          opacity: 1;
-          transform: translateY(0) scale(1);
-          filter: blur(0);
+        .rs-about__impact-header {
+          margin-bottom: 2.5rem;
         }
 
-        .impact-card:hover {
-          transform: translateY(-6px) scale(1.01);
-          box-shadow: 0 18px 45px rgba(0, 0, 0, 0.14);
+        .rs-about__impact-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 1.25rem;
         }
 
-        .impact-card-glow {
+        .about-impact-card {
+          background: rgba(255,255,255,0.05);
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 18px;
+          padding: 1.75rem 1.5rem;
+          text-align: center;
+          cursor: pointer;
+          position: relative;
+          overflow: hidden;
+        }
+        .about-impact-card::before {
+          content: '';
           position: absolute;
-          inset: 0;
-          pointer-events: none;
+          bottom: 0; left: 0; right: 0;
+          height: 3px;
+          background: var(--accent);
+          transform: scaleX(0);
+          transition: transform 0.4s ease;
+          transform-origin: left;
         }
-
-        .impact-card-topline {
-          width: 56px;
-          height: 4px;
-          border-radius: 999px;
-          background: var(--impact-accent);
-          margin-bottom: 1.2rem;
-          position: relative;
-          z-index: 1;
+        .about-impact-card:hover {
+          background: rgba(255,255,255,0.09);
+          box-shadow: 0 16px 48px rgba(0,0,0,0.3);
         }
-
-        .impact-card-value {
-          position: relative;
-          z-index: 1;
-          font-family: 'DM Serif Text', serif;
-          font-size: clamp(2.2rem, 5vw, 3.2rem);
-          line-height: 1;
-          color: #2d2d2d;
+        .about-impact-card:hover::before {
+          transform: scaleX(1);
+        }
+        .about-impact-card__icon {
+          font-size: 2rem;
           margin-bottom: 0.75rem;
         }
-
-        .impact-card-label {
-          position: relative;
-          z-index: 1;
-          font-family: 'Segoe UI', sans-serif;
+        .about-impact-card__num {
+          font-family: 'Fraunces', serif;
+          font-size: clamp(2rem, 3.5vw, 3rem);
+          font-weight: 900;
+          color: var(--accent);
+          line-height: 1;
+          margin-bottom: 6px;
+        }
+        .about-impact-card__label {
+          font-family: 'Inter', sans-serif;
           font-weight: 700;
-          font-size: 1rem;
-          color: #2d2d2d;
-          margin-bottom: 0.8rem;
+          font-size: 0.78rem;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: rgba(249,244,236,0.7);
+          margin-bottom: 10px;
         }
-
-        .impact-card-summary {
-          position: relative;
-          z-index: 1;
-          font-family: 'Segoe UI', sans-serif;
-          font-size: 0.98rem;
-          line-height: 1.6;
-          color: #555;
-          margin-bottom: 1.4rem;
-        }
-
-        .impact-card-footer {
-          position: relative;
-          z-index: 1;
-          font-family: 'Segoe UI', sans-serif;
-          font-size: 0.9rem;
-          font-weight: 700;
-          color: var(--impact-accent);
-        }
-
-
-        .section-card {
-          position: relative;
-          background: rgba(255, 255, 255, 0.9);
-          backdrop-filter: blur(12px);
-          border-radius: 2rem;
-          padding: 3rem;
-          overflow: hidden;
-          border: 1px solid rgba(255, 255, 255, 0.3);
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-          transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-          cursor: pointer;
-          
-          /* Initial state - hidden */
+        .about-impact-card__cta {
+          font-family: 'Inter', sans-serif;
+          font-size: 0.75rem;
+          color: var(--accent);
           opacity: 0;
-          transform: translateY(50px) scale(0.9);
-          filter: blur(8px);
+          transition: opacity 0.3s ease;
         }
-
-        .section-card.section-visible {
-          opacity: 1;
-          transform: translateY(0) scale(1);
-          filter: blur(0px);
-        }
-
-        /* Hover effects only apply to visible cards */
-        .section-card.section-visible:hover {
-          transform: translateY(-8px) scale(1.02);
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-          background: rgba(255, 255, 255, 0.95);
-          border: 1px solid rgba(0, 0, 0, 0.1);
-        }
-
-        .card-bg-stripes {
-          position: absolute;
-          inset: 0;
-          overflow: hidden;
-          z-index: 1;
-          opacity: 0.05;
-        }
-
-        .card-bg-stripe {
-          position: absolute;
-          width: 200%;
-          height: 4px;
-          left: -50%;
-          animation: cardBgFloat 8s ease-in-out infinite;
-        }
-
-        .card-bg-stripe.stripe-1 {
-          background: linear-gradient(90deg, transparent, var(--section-color), transparent);
-          top: 25%;
-          transform: rotate(var(--stripe-angle));
-          animation-delay: 0s;
-        }
-
-        .card-bg-stripe.stripe-2 {
-          background: linear-gradient(90deg, transparent, #e6b800, transparent);
-          top: 50%;
-          transform: rotate(calc(var(--stripe-angle) * -1));
-          animation-delay: -2s;
-        }
-
-        .card-bg-stripe.stripe-3 {
-          background: linear-gradient(90deg, transparent, #21544E, transparent);
-          bottom: 25%;
-          transform: rotate(var(--stripe-angle));
-          animation-delay: -4s;
-        }
-
-        @keyframes cardBgFloat {
-          0%, 100% { 
-            transform: translateX(-15px) rotate(var(--stripe-angle)); 
-          }
-          50% { 
-            transform: translateX(15px) rotate(var(--stripe-angle)); 
-          }
-        }
-
-        .section-header {
-          position: relative;
-          z-index: 5;
-          margin-bottom: 2rem;
-          text-align: center;
-        }
-
-        .section-title {
-          font-family: 'DM Serif Text', Times, serif;
-          font-size: clamp(2rem, 4vw, 2.5rem);
-          color: #2d2d2d;
-          margin: 0 0 1rem 0;
-          font-weight: 700;
-          letter-spacing: -0.5px;
-          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.05);
-          transition: all 0.3s ease;
-        }
-
-        .section-card.section-visible:hover .section-title {
-          color: var(--section-color);
-          transform: translateY(-2px);
-        }
-
-        .title-underline {
-          width: 0;
-          height: 3px;
-          background: linear-gradient(90deg, var(--section-color), #e6b800);
-          margin: 0 auto;
-          border-radius: 2px;
-          transition: all 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
-        }
-
-        .section-card.section-visible:hover .title-underline {
-          width: 100px;
-          box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .section-content {
-          position: relative;
-          z-index: 5;
-        }
-
-        .section-text {
-          font-family: 'Segoe UI', 'Inter', -apple-system, sans-serif;
-          font-size: clamp(1rem, 2.2vw, 1.2rem);
-          color: #444;
-          line-height: 1.7;
-          margin: 0;
-          font-weight: 400;
-          transition: all 0.3s ease;
-          text-align: center;
-        }
-
-        .section-card.section-visible:hover .section-text {
-          color: #222;
-        }
-
-        .diagonal-accent {
-          position: absolute;
-          top: 0;
-          right: 0;
-          width: 120px;
-          height: 120px;
-          background: linear-gradient(135deg, var(--section-color), transparent);
-          transform: rotate(var(--stripe-angle)) translateX(60px) translateY(-60px);
-          border-radius: 20px;
-          opacity: 0;
-          transition: all 0.5s ease;
-          z-index: 2;
-        }
-
-        .section-card.section-visible:hover .diagonal-accent {
-          opacity: 0.1;
-          transform: rotate(var(--stripe-angle)) translateX(40px) translateY(-40px);
-        }
-
-        .hover-glow {
-          position: absolute;
-          inset: -4px;
-          background: linear-gradient(135deg, var(--section-color), transparent, var(--section-color));
-          border-radius: 2.2rem;
-          opacity: 0;
-          transition: all 0.4s ease;
-          filter: blur(20px);
-          z-index: -1;
-        }
-
-        .section-card.section-visible:hover .hover-glow {
-          opacity: 0.3;
-          animation: glowPulse 2s ease-in-out infinite;
-        }
-
-        @keyframes glowPulse {
-          0%, 100% { transform: scale(1); opacity: 0.3; }
-          50% { transform: scale(1.05); opacity: 0.5; }
-        }
-
-        .interactive-stripes {
-          position: absolute;
-          inset: 0;
-          overflow: hidden;
-          border-radius: 2rem;
-          opacity: 0;
-          transition: all 0.4s ease;
-        }
-
-        .section-card.section-visible:hover .interactive-stripes {
+        .about-impact-card:hover .about-impact-card__cta {
           opacity: 1;
         }
 
-        .interactive-stripe {
-          position: absolute;
-          width: 200%;
-          height: 2px;
-          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
-          left: -50%;
-          animation: interactiveStripeSlide 3s ease-in-out infinite;
+        @media (max-width: 900px) {
+          .rs-about__grid { grid-template-columns: 1fr; }
         }
-
-        .interactive-stripe.stripe-i-1 {
-          top: 20%;
-          transform: rotate(var(--stripe-angle));
-          animation-delay: 0s;
+        @media (max-width: 900px) {
+          .rs-about__impact-grid { grid-template-columns: repeat(2, 1fr); }
         }
-
-        .interactive-stripe.stripe-i-2 {
-          top: 50%;
-          transform: rotate(calc(var(--stripe-angle) * -1));
-          animation-delay: -1s;
-        }
-
-        .interactive-stripe.stripe-i-3 {
-          bottom: 20%;
-          transform: rotate(var(--stripe-angle));
-          animation-delay: -2s;
-        }
-
-        @keyframes interactiveStripeSlide {
-          0%, 100% { 
-            transform: translateX(-30px) rotate(var(--stripe-angle)); 
-          }
-          50% { 
-            transform: translateX(30px) rotate(var(--stripe-angle)); 
-          }
-        }
-
-        /* Mobile Responsiveness */
-        @media (max-width: 768px) {
-          .about-us-container {
-            padding: 3rem 1rem;
-          }
-
-          .content-wrapper {
-            gap: 2rem;
-          }
-
-          .impact-section {
-            padding: 1.5rem;
-            border-radius: 1.5rem;
-          }
-
-          .impact-grid {
+        @media (max-width: 640px) {
+          .rs-about__impact-grid {
             grid-template-columns: 1fr;
-          }
-
-          .section-card {
-            padding: 2rem;
-            border-radius: 1.5rem;
-          }
-
-          .section-header {
-            margin-bottom: 1.5rem;
-          }
-
-          .diagonal-accent {
-            width: 80px;
-            height: 80px;
-            transform: rotate(var(--stripe-angle)) translateX(40px) translateY(-40px);
-          }
-
-          .section-card.section-visible:hover .diagonal-accent {
-            transform: rotate(var(--stripe-angle)) translateX(20px) translateY(-20px);
-          }
-        }
-
-        @media (max-width: 480px) {
-          .about-us-container {
-            padding: 2rem 0.5rem;
-          }
-
-          .section-card {
-            padding: 1.5rem;
-            border-radius: 1.2rem;
-          }
-
-          .section-header {
-            margin-bottom: 1rem;
-          }
-
-          .bg-stripe {
-            height: 6vh;
+            gap: 1rem;
           }
         }
       `}</style>
-    </div>
+    </section>
   );
 };
 

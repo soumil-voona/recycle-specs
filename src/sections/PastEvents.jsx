@@ -1,1335 +1,447 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { motion, useInView } from 'motion/react';
 
-const EventCard = ({
-  image,
-  title,
-  date,
-  location,
-  description,
-  impact,
-  color = '#c65d07',
-  stripeAngle = '45deg',
-  index = 0
-}) => {
-  const [isHovered, setIsHovered] = useState(false);
+/* ─── Data ─── */
+const pastEvents = [
+  {
+    image: '/imgs/event1.jpg',
+    title: 'Community Children Eye Screening Drive',
+    subtitle: 'Guntur, India',
+    date: 'July 2025',
+    location: 'Zilla Parishad High School, Guntur, India',
+    description: 'We successfully screened 385 students at Zilla Parishad High School, Guntur, and identified 109 who needed further care. Huge thanks to Vidhisha Paleti, our CEO for leading the effort, Sankara Eye Hospitals for conducting the screenings, and the Rotary Club of Guntur for organizing.',
+    impact: '385 children screened · 40 glasses distributed',
+    color: '#2d7d7d',
+    tag: 'Children\'s Health',
+  },
+  {
+    image: '/imgs/event2.jpg',
+    title: 'Senior Citizens Eye Screening Drive',
+    subtitle: 'Guntur, India',
+    date: 'July 2025',
+    location: 'Sankara Eye Hospital, Pedakkani, Guntur, India',
+    description: 'We screened 210 senior citizens and assessed all needing cataract surgery, helping hundreds get the care they need. Huge thanks to Vidhisha Paleti for leading on the ground, Sankara Eye Hospitals for providing full support, and the Rotary Club of Guntur for organizing.',
+    impact: '210 seniors screened · 120 cataract surgeries scheduled',
+    color: '#c65d07',
+    tag: 'Senior Care',
+  },
+];
+
+const carouselImages = [
+  '/imgs/events/pic1.jpg', '/imgs/events/pic2.jpg', '/imgs/events/pic3.jpg',
+  '/imgs/events/pic4.jpg', '/imgs/events/pic5.jpg', '/imgs/events/pic6.jpg',
+  '/imgs/events/pic7.jpg', '/imgs/events/pic8.jpg', '/imgs/events/pic9.jpg',
+  '/imgs/events/pic10.jpg', '/imgs/events/pic11.jpg', '/imgs/events/pic12.jpg',
+  '/imgs/events/pic13.jpg', '/imgs/events/pic14.jpg', '/imgs/events/pic15.jpg',
+  '/imgs/events/pic16.jpg', '/imgs/events/pic17.jpg', '/imgs/events/pic18.jpg',
+];
+
+/* ─── Event Card ─── */
+const EventCard = ({ event, index }) => {
   const [imageError, setImageError] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
-  
   const ref = useRef(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !isVisible) {
-          setTimeout(() => {
-            setIsVisible(true);
-          }, index * 150);
-        }
-      },
-      { 
-        threshold: 0.2,
-        rootMargin: "-50px 0px -50px 0px"
-      }
-    );
-
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
-
-    return () => {
-      if (ref.current) {
-        observer.unobserve(ref.current);
-      }
-    };
-  }, [index, isVisible]);
+  const isInView = useInView(ref, { once: true, margin: '-60px' });
 
   return (
-    <div
+    <motion.article
       ref={ref}
-      className={`event-card ${isHovered ? 'hovered' : ''} ${isVisible ? 'visible' : ''}`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      style={{
-        '--event-color': color,
-        '--stripe-angle': stripeAngle,
-      }}
+      className="event-card"
+      style={{ '--ec': event.color }}
+      initial={{ opacity: 0, y: 60, scale: 0.95 }}
+      animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+      transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: index * 0.15 }}
+      whileHover={{ y: -8, transition: { duration: 0.35 } }}
     >
-      {/* Background diagonal stripes */}
-      <div className="event-bg-stripes">
-        <div className="event-bg-stripe stripe-bg-1"></div>
-        <div className="event-bg-stripe stripe-bg-2"></div>
-        <div className="event-bg-stripe stripe-bg-3"></div>
-      </div>
-
-      {/* Event Image Container */}
-      <div className="image-container">
-        <div className="image-frame-events">
-          {!imageError ? (
-            <img
-              src={image}
-              alt={`${title} event`}
-              className="event-image"
-              onError={() => setImageError(true)}
-            />
-          ) : (
-            <div className="image-placeholder">
-              <div className="placeholder-icon">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" strokeWidth="2"/>
-                  <circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" strokeWidth="2"/>
-                  <path d="M21 15l-5-5L5 21" stroke="currentColor" strokeWidth="2"/>
-                </svg>
-              </div>
-            </div>
-          )}
-          
-          {/* Animated border stripes */}
-          <div className="image-border-stripes">
-            <div className="border-stripe stripe-1"></div>
-            <div className="border-stripe stripe-2"></div>
-            <div className="border-stripe stripe-3"></div>
-          </div>
-        </div>
-        <div className="image-glow"></div>
-      </div>
-
-      {/* Event Content */}
-      <div className="event-content">
-        <div className="title-section">
-          <h3 className="event-title">{title}</h3>
-          <div className="title-underline"></div>
-        </div>
-        
-        <div className="meta-section">
-          <div className="meta-item">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" strokeWidth="2"/>
-              <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" strokeWidth="2"/>
-              <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" strokeWidth="2"/>
-              <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" strokeWidth="2"/>
+      {/* Image */}
+      <div className="event-card__img-wrap">
+        {!imageError ? (
+          <img
+            src={event.image}
+            alt={event.title}
+            className="event-card__img"
+            onError={() => setImageError(true)}
+          />
+        ) : (
+          <div className="event-card__img-placeholder">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <rect x="3" y="3" width="18" height="18" rx="3"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <path d="M21 15l-5-5L5 21"/>
             </svg>
-            <span className="meta-date">{date}</span>
-          </div>
-          
-          <div className="meta-item">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke="currentColor" strokeWidth="2"/>
-              <circle cx="12" cy="10" r="3" stroke="currentColor" strokeWidth="2"/>
-            </svg>
-            <span className="meta-location">{location}</span>
-          </div>
-        </div>
-        
-        <div className="description-section">
-          <p className="event-description">{description}</p>
-        </div>
-
-        {impact && (
-          <div className="impact-section">
-            <div className="impact-label">Impact:</div>
-            <div className="impact-text">{impact}</div>
           </div>
         )}
-      </div>
-
-      {/* Interactive stripes */}
-      <div className="interactive-stripes">
-        <div className="interactive-stripe stripe-i-1"></div>
-        <div className="interactive-stripe stripe-i-2"></div>
-      </div>
-
-      {/* Hover overlay */}
-      <div className="hover-overlay"></div>
-
-      <style jsx>{`
-        .event-card {
-          position: relative;
-          width: 100%;
-          max-width: 400px;
-          height: auto;
-          min-height: 450px;
-          background: rgba(255, 255, 255, 0.9);
-          backdrop-filter: blur(12px);
-          border-radius: 24px;
-          padding: 2rem;
-          display: flex;
-          flex-direction: column;
-          overflow: hidden;
-          border: 1px solid rgba(255, 255, 255, 0.3);
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-          cursor: pointer;
-          
-          /* Initial state - hidden */
-          opacity: 0;
-          transform: translateY(50px) scale(0.9);
-          filter: blur(8px);
-          transition: all 0.8s cubic-bezier(0.25, 0.25, 0.25, 1);
-        }
-
-        .event-card.visible {
-          opacity: 1;
-          transform: translateY(0) scale(1);
-          filter: blur(0px);
-        }
-
-        .event-card.hovered {
-          transform: translateY(-12px) scale(1.03);
-          box-shadow: 0 24px 80px rgba(0, 0, 0, 0.2);
-          background: rgba(255, 255, 255, 0.95);
-          border: 1px solid var(--event-color);
-        }
-
-        .event-card.visible.hovered {
-          transform: translateY(-12px) scale(1.03);
-        }
-
-        .event-bg-stripes {
-          position: absolute;
-          inset: 0;
-          overflow: hidden;
-          z-index: 1;
-          opacity: 0.06;
-        }
-
-        .event-bg-stripe {
-          position: absolute;
-          width: 200%;
-          height: 4px;
-          left: -50%;
-          animation: eventBgFloat 10s ease-in-out infinite;
-        }
-
-        .stripe-bg-1 {
-          background: linear-gradient(90deg, transparent, var(--event-color), transparent);
-          top: 20%;
-          transform: rotate(var(--stripe-angle));
-          animation-delay: 0s;
-        }
-
-        .stripe-bg-2 {
-          background: linear-gradient(90deg, transparent, #e6b800, transparent);
-          top: 50%;
-          transform: rotate(calc(var(--stripe-angle) * -1));
-          animation-delay: -3s;
-        }
-
-        .stripe-bg-3 {
-          background: linear-gradient(90deg, transparent, #2d7d7d, transparent);
-          bottom: 20%;
-          transform: rotate(var(--stripe-angle));
-          animation-delay: -6s;
-        }
-
-        @keyframes eventBgFloat {
-          0%, 100% { transform: translateX(-20px) rotate(var(--stripe-angle)); }
-          50% { transform: translateX(20px) rotate(var(--stripe-angle)); }
-        }
-
-        .image-container {
-          position: relative;
-          margin-bottom: 1.5rem;
-          z-index: 5;
-          opacity: 0;
-          transform: scale(0.8);
-          transition: all 0.6s ease;
-          transition-delay: 0.3s;
-        }
-
-        .event-card.visible .image-container {
-          opacity: 1;
-          transform: scale(1);
-        }
-
-        .image-frame-events {
-          position: relative;
-          width: 100%;
-          height: 200px;
-          border-radius: 16px;
-          overflow: hidden;
-          transition: all 0.4s ease;
-        }
-
-        .event-card.hovered .image-frame-events {
-          transform: scale(1.05);
-          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
-        }
-
-        .event-image {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          transition: all 0.4s ease;
-          filter: brightness(1.1) contrast(1.05);
-        }
-
-        .event-card.hovered .event-image {
-          filter: brightness(1.2) contrast(1.1) saturate(1.1);
-        }
-
-        .image-placeholder {
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: #6c757d;
-        }
-
-        .placeholder-icon {
-          opacity: 0.7;
-        }
-
-        .image-border-stripes {
-          position: absolute;
-          inset: 0;
-          border-radius: 16px;
-          overflow: hidden;
-          opacity: 0;
-          transition: all 0.4s ease;
-        }
-
-        .event-card.hovered .image-border-stripes {
-          opacity: 0.3;
-        }
-
-        .border-stripe {
-          position: absolute;
-          width: 200%;
-          height: 2px;
-          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
-          left: -50%;
-          animation: borderStripeSlide 2s linear infinite;
-        }
-
-        .border-stripe.stripe-1 {
-          top: 20%;
-          animation-delay: 0s;
-        }
-
-        .border-stripe.stripe-2 {
-          top: 50%;
-          animation-delay: -0.7s;
-        }
-
-        .border-stripe.stripe-3 {
-          bottom: 20%;
-          animation-delay: -1.3s;
-        }
-
-        @keyframes borderStripeSlide {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
-        }
-
-        .image-glow {
-          position: absolute;
-          inset: -8px;
-          background: linear-gradient(135deg, var(--event-color), transparent, var(--event-color));
-          border-radius: 24px;
-          opacity: 0;
-          transition: all 0.4s ease;
-          filter: blur(16px);
-          z-index: -1;
-        }
-
-        .event-card.hovered .image-glow {
-          opacity: 0.4;
-          animation: imageGlowPulse 2s ease-in-out infinite;
-        }
-
-        @keyframes imageGlowPulse {
-          0%, 100% { transform: scale(1); opacity: 0.4; }
-          50% { transform: scale(1.1); opacity: 0.6; }
-        }
-
-        .event-content {
-          position: relative;
-          z-index: 5;
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          opacity: 0;
-          transform: translateY(20px);
-          transition: all 0.7s ease;
-          transition-delay: 0.5s;
-        }
-
-        .event-card.visible .event-content {
-          opacity: 1;
-          transform: translateY(0);
-        }
-
-        .title-section {
-          position: relative;
-          margin-bottom: 1rem;
-        }
-
-        .event-title {
-          font-family: 'DM Serif Text', 'Inter', 'SF Pro Display', -apple-system, sans-serif;
-          font-weight: 700;
-          font-size: 1.4rem;
-          color: #2d2d2d;
-          margin: 0;
-          letter-spacing: -0.5px;
-          transition: all 0.3s ease;
-          line-height: 1.3;
-        }
-
-        .event-card.hovered .event-title {
-          color: var(--event-color);
-          transform: translateY(-2px);
-        }
-
-        .title-underline {
-          width: 0;
-          height: 2px;
-          background: linear-gradient(90deg, var(--event-color), #e6b800);
-          margin: 0.5rem 0;
-          border-radius: 1px;
-          transition: all 0.4s ease;
-        }
-
-        .event-card.hovered .title-underline {
-          width: 60px;
-        }
-
-        .meta-section {
-          margin-bottom: 1rem;
-        }
-
-        .meta-item {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          margin-bottom: 0.5rem;
-          color: #666;
-          font-size: 0.9rem;
-          transition: all 0.3s ease;
-        }
-
-        .meta-item svg {
-          stroke: var(--event-color);
-          transition: all 0.3s ease;
-        }
-
-        .event-card.hovered .meta-item {
-          color: #555;
-        }
-
-        .event-card.hovered .meta-item svg {
-          stroke: var(--event-color);
-        }
-
-        .meta-date, .meta-location {
-          font-family: 'Inter', 'SF Pro Display', -apple-system, sans-serif;
-          font-weight: 500;
-        }
-
-        .description-section {
-          margin-bottom: 1rem;
-          flex: 1;
-        }
-
-        .event-description {
-          font-family: 'Segoe UI', 'Inter', -apple-system, sans-serif;
-          font-size: 0.9rem;
-          line-height: 1.6;
-          color: #555;
-          margin: 0;
-          transition: all 0.3s ease;
-        }
-
-        .event-card.hovered .event-description {
-          color: #333;
-        }
-
-        .impact-section {
-          margin-top: auto;
-          padding: 1rem;
-          background: linear-gradient(135deg, rgba(0, 0, 0, 0.03), rgba(0, 0, 0, 0.01));
-          border-radius: 12px;
-          border-left: 3px solid var(--event-color);
-        }
-
-        .impact-label {
-          font-family: 'Inter', 'SF Pro Display', -apple-system, sans-serif;
-          font-weight: 700;
-          font-size: 0.8rem;
-          color: var(--event-color);
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-          margin-bottom: 0.5rem;
-        }
-
-        .impact-text {
-          font-family: 'Segoe UI', 'Inter', -apple-system, sans-serif;
-          font-size: 0.9rem;
-          color: #444;
-          font-weight: 600;
-        }
-
-        .interactive-stripes {
-          position: absolute;
-          inset: 0;
-          overflow: hidden;
-          border-radius: 24px;
-          opacity: 0;
-          transition: all 0.4s ease;
-        }
-
-        .event-card.hovered .interactive-stripes {
-          opacity: 1;
-        }
-
-        .interactive-stripe {
-          position: absolute;
-          width: 200%;
-          height: 2px;
-          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
-          left: -50%;
-          animation: interactiveStripeSlide 3s ease-in-out infinite;
-        }
-
-        .interactive-stripe.stripe-i-1 {
-          top: 30%;
-          transform: rotate(var(--stripe-angle));
-          animation-delay: 0s;
-        }
-
-        .interactive-stripe.stripe-i-2 {
-          bottom: 30%;
-          transform: rotate(calc(var(--stripe-angle) * -1));
-          animation-delay: -1.5s;
-        }
-
-        @keyframes interactiveStripeSlide {
-          0%, 100% { 
-            transform: translateX(-30px) rotate(var(--stripe-angle)); 
-          }
-          50% { 
-            transform: translateX(30px) rotate(var(--stripe-angle)); 
-          }
-        }
-
-        .hover-overlay {
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
-          border-radius: 24px;
-          opacity: 0;
-          transition: all 0.4s ease;
-          z-index: 10;
-          pointer-events: none;
-        }
-
-        .event-card.hovered .hover-overlay {
-          opacity: 1;
-        }
-
-        /* Mobile Responsiveness */
-        @media (max-width: 768px) {
-          .event-card {
-            max-width: 350px;
-            min-height: 400px;
-            padding: 1.5rem;
-          }
-
-          .image-frame-events {
-            height: 160px;
-          }
-
-          .event-title {
-            font-size: 1.3rem;
-          }
-
-          .event-description {
-            font-size: 0.85rem;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .event-card {
-            max-width: 300px;
-            min-height: 380px;
-            padding: 1.2rem;
-          }
-
-          .image-frame-events {
-            height: 140px;
-          }
-
-          .event-title {
-            font-size: 1.2rem;
-          }
-        }
-      `}</style>
-    </div>
-  );
-};
-
-const ImageCarousel = ({ images, currentIndex, onIndexChange }) => {
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [translateX, setTranslateX] = useState(0);
-
-  const handleMouseDown = (e) => {
-    setIsDragging(true);
-    setStartX(e.clientX);
-  };
-
-  const handleMouseMove = (e) => {
-    if (!isDragging) return;
-    const diff = e.clientX - startX;
-    setTranslateX(diff);
-  };
-
-  const handleMouseUp = () => {
-    if (!isDragging) return;
-    
-    const threshold = 100;
-    if (translateX > threshold && currentIndex > 0) {
-      onIndexChange(currentIndex - 1);
-    } else if (translateX < -threshold && currentIndex < images.length - 1) {
-      onIndexChange(currentIndex + 1);
-    }
-    
-    setIsDragging(false);
-    setTranslateX(0);
-  };
-
-  return (
-    <div className="carousel-container">
-      <div className="carousel-wrapper">
-        <div
-          className="carousel-track"
-          style={{
-            transform: `translateX(calc(-${currentIndex * 100}% + ${isDragging ? translateX : 0}px))`
-          }}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
+        <div className="event-card__img-overlay" />
+        <motion.div
+          className="event-card__tag"
+          initial={{ opacity: 0, x: -10 }}
+          animate={isInView ? { opacity: 1, x: 0 } : {}}
+          transition={{ duration: 0.5, delay: index * 0.15 + 0.3 }}
         >
-          {images.map((image, index) => (
-            <div key={index} className="carousel-slide">
-              <img src={image} alt={`Event ${index + 1}`} className="carousel-image" />
-            </div>
-          ))}
+          {event.tag}
+        </motion.div>
+        <div className="event-card__date">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          {event.date}
         </div>
       </div>
 
-      {/* Navigation dots */}
-      <div className="carousel-dots">
-        {images.map((_, index) => (
-          <button
-            key={index}
-            className={`dot ${index === currentIndex ? 'active' : ''}`}
-            onClick={() => onIndexChange(index)}
-          />
-        ))}
+      {/* Content */}
+      <div className="event-card__content">
+        <div className="event-card__location">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+          {event.location}
+        </div>
+        <h3 className="event-card__title">{event.title}</h3>
+        <p className="event-card__subtitle">{event.subtitle}</p>
+        <p className="event-card__desc">{event.description}</p>
+
+        <motion.div
+          className="event-card__impact"
+          initial={{ opacity: 0, x: -20 }}
+          animate={isInView ? { opacity: 1, x: 0 } : {}}
+          transition={{ duration: 0.6, delay: index * 0.15 + 0.4 }}
+        >
+          <span className="event-card__impact-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block' }}>
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+          </span>
+          <span>{event.impact}</span>
+        </motion.div>
       </div>
 
-      {/* Navigation arrows */}
-      <button
-        className="carousel-nav prev"
-        onClick={() => onIndexChange(Math.max(0, currentIndex - 1))}
-        disabled={currentIndex === 0}
-      >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      </button>
-
-      <button
-        className="carousel-nav next"
-        onClick={() => onIndexChange(Math.min(images.length - 1, currentIndex + 1))}
-        disabled={currentIndex === images.length - 1}
-      >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      </button>
-
-      <style jsx>{`
-        .carousel-container {
-          position: relative;
-          width: 100%;
-          max-width: 600px;
-          margin: 0 auto 3rem auto;
-        }
-
-        .carousel-wrapper {
-          position: relative;
-          width: 100%;
-          height: 300px;
-          overflow: hidden;
-          border-radius: 20px;
-          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-        }
-
-        .carousel-track {
-          display: flex;
-          width: 100%;
-          height: 100%;
-          transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
-          cursor: grab;
-        }
-
-        .carousel-track:active {
-          cursor: grabbing;
-        }
-
-        .carousel-slide {
-          flex: 0 0 100%;
-          height: 100%;
-        }
-
-        .carousel-image {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          user-select: none;
-          pointer-events: none;
-        }
-
-        .carousel-dots {
-          display: flex;
-          justify-content: center;
-          gap: 0.5rem;
-          margin-top: 1rem;
-        }
-
-        .dot {
-          width: 10px;
-          height: 10px;
-          border-radius: 50%;
-          border: none;
-          background: rgba(0, 0, 0, 0.3);
-          cursor: pointer;
-          transition: all 0.3s ease;
-        }
-
-        .dot:hover {
-          background: rgba(0, 0, 0, 0.5);
-          transform: scale(1.2);
-        }
-
-        .dot.active {
-          background: #c65d07;
-          transform: scale(1.3);
-        }
-
-        .carousel-nav {
-          position: absolute;
-          top: 50%;
-          transform: translateY(-50%);
-          width: 48px;
-          height: 48px;
-          background: rgba(255, 255, 255, 0.9);
-          backdrop-filter: blur(12px);
-          border: none;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-          z-index: 10;
-        }
-
-        .carousel-nav:hover:not(:disabled) {
-          background: rgba(255, 255, 255, 0.95);
-          transform: translateY(-50%) scale(1.1);
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-        }
-
-        .carousel-nav:disabled {
-          opacity: 0.3;
-          cursor: not-allowed;
-        }
-
-        .carousel-nav svg {
-          color: #333;
-        }
-
-        .prev {
-          left: 1rem;
-        }
-
-        .next {
-          right: 1rem;
-        }
-
-        @media (max-width: 768px) {
-          .carousel-wrapper {
-            height: 250px;
-          }
-
-          .carousel-nav {
-            width: 40px;
-            height: 40px;
-          }
-
-          .prev {
-            left: 0.5rem;
-          }
-
-          .next {
-            right: 0.5rem;
-          }
-        }
-      `}</style>
-    </div>
+      <div className="event-card__accent-bar" />
+    </motion.article>
   );
 };
 
-////////////////////////////////////////////////////////////////////////////////
-// NEW: EventCardCarousel - mobile swipeable carousel for EventCard components
-const EventCardCarousel = ({ members, currentIndex, onIndexChange }) => {
-  const trackRef = React.useRef(null);
-  const wrapRef = React.useRef(null);
-  const pointerIdRef = React.useRef(null);
-  const startXRef = React.useRef(0);
-  const isDraggingRef = React.useRef(false);
-  const rafRef = React.useRef(null);
-  const currentTranslateRef = React.useRef(0);
-
-  const goToIndex = (index) => {
-    const wrap = wrapRef.current;
-    if (!wrap || !trackRef.current) return;
-    const w = wrap.clientWidth;
-    const clamped = Math.max(0, Math.min(index, members.length - 1));
-    onIndexChange(clamped);
-    trackRef.current.style.transition = 'transform 420ms cubic-bezier(0.22, 0.9, 0.32, 1)';
-    trackRef.current.style.transform = `translateX(${-clamped * w}px)`;
-    currentTranslateRef.current = -clamped * w;
-  };
-
-  const applyTranslate = (tx) => {
-    if (trackRef.current) {
-      trackRef.current.style.transition = 'none';
-      trackRef.current.style.transform = `translateX(${tx}px)`;
-    }
-  };
-
-  React.useEffect(() => {
-    const wrap = wrapRef.current;
-    if (!wrap) return;
-
-    const onPointerDown = (ev) => {
-      if (ev.isPrimary === false) return;
-      pointerIdRef.current = ev.pointerId;
-      try { wrap.setPointerCapture(pointerIdRef.current); } catch (e) {}
-      isDraggingRef.current = true;
-      startXRef.current = ev.clientX;
-      if (trackRef.current) trackRef.current.style.transition = 'none';
-      wrap.style.touchAction = 'pan-y';
-    };
-
-    const onPointerMove = (ev) => {
-      if (!isDraggingRef.current) return;
-      const wrapW = wrap.clientWidth;
-      const delta = ev.clientX - startXRef.current;
-      const candidate = currentTranslateRef.current + delta;
-      const maxTranslate = 0;
-      const minTranslate = -(members.length - 1) * wrapW;
-      let tx = candidate;
-      if (candidate > maxTranslate + 80) tx = maxTranslate + 80;
-      if (candidate < minTranslate - 80) tx = minTranslate - 80;
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      rafRef.current = requestAnimationFrame(() => applyTranslate(tx));
-    };
-
-    const onPointerUp = (ev) => {
-      if (!isDraggingRef.current) return;
-      isDraggingRef.current = false;
-      try { wrap.releasePointerCapture(pointerIdRef.current); } catch(e) {}
-      const wrapW = wrap.clientWidth;
-      const delta = ev.clientX - startXRef.current;
-      const threshold = 0.18;
-      let newIndex = currentIndex;
-      if (delta < -wrapW * threshold && currentIndex < members.length - 1) newIndex = currentIndex + 1;
-      else if (delta > wrapW * threshold && currentIndex > 0) newIndex = currentIndex - 1;
-      currentTranslateRef.current = -newIndex * wrapW;
-      goToIndex(newIndex);
-    };
-
-    wrap.addEventListener('pointerdown', onPointerDown);
-    window.addEventListener('pointermove', onPointerMove);
-    window.addEventListener('pointerup', onPointerUp);
-    window.addEventListener('pointercancel', onPointerUp);
-
-    return () => {
-      wrap.removeEventListener('pointerdown', onPointerDown);
-      window.removeEventListener('pointermove', onPointerMove);
-      window.removeEventListener('pointerup', onPointerUp);
-      window.removeEventListener('pointercancel', onPointerUp);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [members.length, currentIndex]);
-
-  React.useEffect(() => {
-    const wrap = wrapRef.current;
-    if (!wrap || !trackRef.current) return;
-    const w = wrap.clientWidth;
-    trackRef.current.style.transition = 'transform 420ms cubic-bezier(0.22, 0.9, 0.32, 1)';
-    trackRef.current.style.transform = `translateX(${-currentIndex * w}px)`;
-    currentTranslateRef.current = -currentIndex * w;
-  }, [currentIndex]);
-
-  React.useEffect(() => {
-    const onKey = (e) => {
-      if (e.key === 'ArrowLeft') goToIndex(Math.max(0, currentIndex - 1));
-      if (e.key === 'ArrowRight') goToIndex(Math.min(members.length - 1, currentIndex + 1));
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [currentIndex, members.length]);
+/* ─── Gallery Carousel ─── */
+const PhotoGallery = () => {
+  const [loaded, setLoaded] = useState({});
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: '-40px' });
 
   return (
-    <div className="events-card-carousel-container" aria-roledescription="carousel">
-      <button
-        className="nav-arrow left"
-        onClick={() => goToIndex(Math.max(0, currentIndex - 1))}
-        aria-label="Previous event"
-        disabled={currentIndex === 0}
-      >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-          <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      </button>
+    <motion.div
+      className="rs-gallery"
+      ref={ref}
+      initial={{ opacity: 0, y: 30 }}
+      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+    >
+      <div className="rs-gallery__header">
 
-      <div className="carousel-viewport" ref={wrapRef}>
-        <div className="carousel-track" ref={trackRef} style={{ transform: `translateX(${-currentIndex * 100}%)` }}>
-          {members.map((m, idx) => (
-            <div key={idx} className="events-carousel-slide" role="group" aria-roledescription="slide" aria-label={`${idx + 1} of ${members.length}`}>
-              <EventCard
-                image={m.image}
-                title={m.title}
-                date={m.date}
-                location={m.location}
-                description={m.description}
-                impact={m.impact}
-                color={m.color}
-                stripeAngle={m.stripeAngle}
-                index={idx}
+        <h3 className="rs-gallery__title">Moments from Our Drives</h3>
+        <p className="rs-gallery__subtitle">Candid photos from our screening events in Guntur, India</p>
+      </div>
+
+      <div className="rs-gallery__track-wrapper">
+        <div className="rs-gallery__track">
+          {[...carouselImages, ...carouselImages].map((src, i) => (
+            <div
+              key={i}
+              className="rs-gallery__item"
+              style={{ display: loaded[i % carouselImages.length] === false ? 'none' : 'block' }}
+            >
+              <img
+                src={src}
+                alt={`RecycleSpecs event photo ${(i % carouselImages.length) + 1}`}
+                className="rs-gallery__img"
+                onError={() => setLoaded(prev => ({ ...prev, [i % carouselImages.length]: false }))}
+                onLoad={() => setLoaded(prev => ({ ...prev, [i % carouselImages.length]: true }))}
+                loading="lazy"
               />
             </div>
           ))}
         </div>
       </div>
+    </motion.div>
+  );
+};
 
-      <button
-        className="nav-arrow right"
-        onClick={() => goToIndex(Math.min(members.length - 1, currentIndex + 1))}
-        aria-label="Next event"
-        disabled={currentIndex === members.length - 1}
-      >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-          <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      </button>
+/* ─── Main Component ─── */
+const PastEvents = () => {
+  const headerRef = useRef(null);
+  const isHeaderInView = useInView(headerRef, { once: true, margin: '-60px' });
 
-      <div className="carousel-dots" role="tablist" aria-label="Events">
-        {members.map((_, idx) => (
-          <button
-            key={idx}
-            className={`dot ${idx === currentIndex ? 'active' : ''}`}
-            onClick={() => goToIndex(idx)}
-            aria-label={`Go to event ${idx + 1}`}
-            aria-selected={idx === currentIndex}
-            role="tab"
-          />
-        ))}
+  return (
+    <section className="rs-events" id="events">
+      <div className="rs-events__inner">
+        <motion.div
+          ref={headerRef}
+          className="rs-events__header"
+          initial={{ opacity: 0, y: 40 }}
+          animate={isHeaderInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+        >
+
+          <h2 className="section-title rs-events__title">
+            Our Work in<br /><em>the Field</em>
+          </h2>
+          <p className="section-subtitle">
+            Every event is a step forward in our mission to bring clear vision to communities that need it most.
+          </p>
+        </motion.div>
+
+        <div className="rs-events__grid">
+          {pastEvents.map((event, i) => (
+            <EventCard key={event.title} event={event} index={i} />
+          ))}
+        </div>
+
+        <PhotoGallery />
       </div>
 
-      <style jsx>{`
-        .events-card-carousel-container { width: 100%; margin: 0 auto 1.75rem; position: relative; max-width: 420px; }
-        .carousel-viewport { overflow: hidden; touch-action: pan-y; border-radius: 18px; }
-        .carousel-track {
-          display: flex;
-          width: 100%;
-          will-change: transform;
-          user-select: none;
-          -webkit-user-drag: none;
-        }
-        .events-carousel-slide {
-          flex: 0 0 100%;
-          box-sizing: border-box;
-          padding: 0.9rem;
-          display: flex;
-          justify-content: center;
+      <style>{`
+        .rs-events {
+          background: var(--bg-sand);
+          padding: var(--section-pad-y) 0;
+          position: relative;
+          overflow: hidden;
         }
 
-        /* arrows */
-        .nav-arrow {
+        .rs-events__inner {
+          max-width: 1280px;
+          margin: 0 auto;
+          padding: 0 var(--section-pad-x);
+        }
+
+        .rs-events__header { margin-bottom: 2.5rem; max-width: 680px; }
+        .rs-events__title { font-size: clamp(2.4rem, 4.5vw, 3.8rem); }
+        .rs-events__title em {
+          font-style: italic;
+          color: var(--rs-teal);
+        }
+
+        .rs-events__grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 1.75rem;
+          margin-bottom: 3rem;
+        }
+
+        .event-card {
+          background: var(--bg-parchment);
+          border-radius: 22px;
+          overflow: hidden;
+          border: 1px solid rgba(64,58,58,0.06);
+          position: relative;
+          display: flex;
+          flex-direction: column;
+        }
+        .event-card:hover {
+          box-shadow: 0 28px 70px rgba(64,58,58,0.15);
+        }
+        .event-card__accent-bar {
           position: absolute;
-          top: 50%;
-          transform: translateY(-50%);
-          width: 36px;
-          height: 36px;
-          border-radius: 50%;
-          background: rgba(255,255,255,0.95);
-          border: 0;
-          box-shadow: 0 6px 18px rgba(2,6,23,0.12);
-          cursor: pointer;
-          z-index: 12;
+          top: 0; left: 0;
+          width: 100%; height: 4px;
+          background: var(--ec);
+        }
+
+        .event-card__img-wrap {
+          position: relative;
+          height: 260px;
+          overflow: hidden;
+          flex-shrink: 0;
+        }
+        .event-card__img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.8s var(--ease-out-expo);
+        }
+        .event-card:hover .event-card__img {
+          transform: scale(1.06);
+        }
+        .event-card__img-overlay {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(180deg, transparent 40%, rgba(28,24,21,0.5) 100%);
+        }
+        .event-card__img-placeholder {
+          width: 100%;
+          height: 100%;
+          background: var(--bg-warm);
           display: flex;
           align-items: center;
           justify-content: center;
-          color: #444;
-          transition: all 220ms ease;
-        }
-        .nav-arrow:hover { transform: translateY(-50%) scale(1.03); color: #c65d07; }
-        .nav-arrow.left { left: 8px; }
-        .nav-arrow.right { right: 8px; }
-        .nav-arrow[disabled] { opacity: 0.45; cursor: default; transform: translateY(-50%); }
-
-        .carousel-dots { display:flex; justify-content:center; gap:0.5rem; margin-top:0.9rem; }
-        .dot { width:9px; height:9px; border-radius:50%; border:none; background: rgba(0,0,0,0.18); padding:0; }
-        .dot.active { background: #c65d07; transform: scale(1.2); }
-
-        /* hide on desktop - remain mobile only */
-        @media (min-width: 769px) { .events-card-carousel-container { display: none; } }
-      `}</style>
-    </div>
-  );
-};
-////////////////////////////////////////////////////////////////////////////////
-
-const PastEvents = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  const [headerVisible, setHeaderVisible] = useState(false);
-  const [currentCarouselIndex, setCurrentCarouselIndex] = useState(0);
-  // mobile event cards carousel index
-  const [currentEventIndex, setCurrentEventIndex] = useState(0);
-  const headerRef = useRef(null);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsVisible(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setHeaderVisible(true);
-        }
-      },
-      { threshold: 0.5 }
-    );
-
-    if (headerRef.current) {
-      observer.observe(headerRef.current);
-    }
-
-    return () => {
-      if (headerRef.current) {
-        observer.unobserve(headerRef.current);
-      }
-    };
-  }, []);
-
-  const pastEvents = [
-    {
-      image: "/imgs/event1.png",
-      title: "Community Children Eye Screening Drive in Guntur, India",
-      date: "July, 2025",
-      location: "Zilla Parishad High School, Guntur, India",
-      description: "We successfully screened 385 students at Zilla Parishad High School, Guntur, and identified 109 who needed further care. Huge thanks to Vidhisha Paleti, our CEO for leading the effort, Sankara Eye Hospitals for conducting the screenings, the Rotary Club of Guntur for organizing, and the students for their cooperation. Grateful to everyone who made this possible! ",
-      impact: "385 children screened, 40 glasses distributed",
-      color: "#2d7d7d",
-      stripeAngle: "45deg"
-    },
-    {
-      image: "/imgs/event2.png",
-      title: "Community Senior Citizens Eye Screening Drive in Guntur, India",
-      date: "July, 2025",
-      location: "Sankara Eye Hospital, Pedakkani, Guntur, India",
-      description: "We screened 210 senior citizens, and assessed all needing cataract surgery helping hundreds get the care they need. Huge thanks to Vidhisha Paleti for leading on the ground, Sankara Eye Hospitals for providing full support, and the Rotary Club of Guntur for organizing. Grateful to all who made this possible!",
-      impact: "210 senior citizens screened, 120 cataract surgeries scheduled",
-      color: "#c65d07",
-      stripeAngle: "-45deg"
-    },
-  ];
-
-  // Example carousel images
-  const carouselImages = [
-    "/imgs/events/pic1.png",
-    "/imgs/events/pic2.png",
-    "/imgs/events/pic3.png",
-    "/imgs/events/pic4.png",
-    "/imgs/events/pic5.png",
-    "/imgs/events/pic6.png",
-    "/imgs/events/pic7.png",
-    "/imgs/events/pic8.png",
-    "/imgs/events/pic9.png",
-    "/imgs/events/pic10.png",
-    "/imgs/events/pic11.png",
-    "/imgs/events/pic12.png",
-    "/imgs/events/pic13.png",
-    "/imgs/events/pic14.png",
-    "/imgs/events/pic15.png",
-    "/imgs/events/pic16.png",
-    "/imgs/events/pic17.png",
-    "/imgs/events/pic18.png",
-    
-  ];
-
-  return (
-    <div className={`past-events-container ${isVisible ? 'visible' : ''}`}>
-      {/* Background diagonal stripes */}
-      <div className="bg-decoration">
-        <div className="bg-stripe bg-stripe-1"></div>
-        <div className="bg-stripe bg-stripe-2"></div>
-        <div className="bg-stripe bg-stripe-3"></div>
-        <div className="bg-stripe bg-stripe-4"></div>
-        <div className="bg-stripe bg-stripe-5"></div>
-      </div>
-
-      <div 
-        ref={headerRef}
-        className={`events-header ${headerVisible ? 'header-visible' : ''}`}
-      >
-        <h2 className="section-title" style={{fontSize: 'clamp(3rem, 8vw, 6rem)'}}>Past Events</h2>
-        <p className="section-subtitle">
-          Celebrating our journey and the communities we've served together
-        </p>
-        <div className="header-underline"></div>
-      </div>
-
-      {/* Image Carousel */}
-      <ImageCarousel 
-        images={carouselImages}
-        currentIndex={currentCarouselIndex}
-        onIndexChange={setCurrentCarouselIndex}
-      />
-
-      {/* Mobile-only: Event cards carousel (swipeable) */}
-      <EventCardCarousel
-        members={pastEvents}
-        currentIndex={Math.min(currentEventIndex, pastEvents.length - 1)}
-        onIndexChange={setCurrentEventIndex}
-      />
-      
-      {/* Events Grid */}
-      <div className="events-grid">
-        {pastEvents.map((event, index) => (
-          <EventCard
-            key={index}
-            image={event.image}
-            title={event.title}
-            date={event.date}
-            location={event.location}
-            description={event.description}
-            impact={event.impact}
-            color={event.color}
-            stripeAngle={event.stripeAngle}
-            index={index}
-          />
-        ))}
-      </div>
-
-      <style jsx>{`
-        .past-events-container {
-          position: relative;
-          padding: 4rem 2rem;
-          max-width: 1400px;
-          margin: 0 auto;
-          overflow: hidden;
-          opacity: 0;
-          transform: translateY(50px);
-          transition: all 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+          color: var(--text-muted);
         }
 
-        .past-events-container.visible {
-          opacity: 1;
-          transform: translateY(0);
-        }
-
-        .bg-decoration {
+        .event-card__tag {
           position: absolute;
-          inset: 0;
-          overflow: hidden;
-          z-index: 1;
-          opacity: 0.08;
-        }
-
-        .bg-stripe {
-          position: absolute;
-          width: 200%;
-          height: 8vh;
-          left: -50%;
-          animation: bgFloat 12s ease-in-out infinite;
-          transform-origin: center;
-        }
-
-        .bg-stripe-1 {
-          background: linear-gradient(45deg, #403A3A, transparent);
-          top: 10%;
-          transform: rotate(-15deg);
-          animation-delay: 0s;
-        }
-
-        .bg-stripe-2 {
-          background: linear-gradient(45deg, #924014, transparent);
-          top: 25%;
-          transform: rotate(15deg);
-          animation-delay: -2s;
-        }
-
-        .bg-stripe-3 {
-          background: linear-gradient(45deg, #EAC19E, transparent);
-          top: 40%;
-          transform: rotate(-15deg);
-          animation-delay: -4s;
-        }
-
-        .bg-stripe-4 {
-          background: linear-gradient(45deg, #DA9F1A, transparent);
-          top: 55%;
-          transform: rotate(15deg);
-          animation-delay: -6s;
-        }
-
-        .bg-stripe-5 {
-          background: linear-gradient(45deg, #21544E, transparent);
-          top: 70%;
-          transform: rotate(-15deg);
-          animation-delay: -8s;
-        }
-
-        @keyframes bgFloat {
-          0%, 100% { 
-            transform: translateX(-20px) rotate(-15deg); 
-            opacity: 0.05; 
-          }
-          50% { 
-            transform: translateX(20px) rotate(-15deg); 
-            opacity: 0.12; 
-          }
-        }
-
-        .events-header {
-          position: relative;
-          z-index: 10;
-          text-align: center;
-          margin-bottom: 3rem;
-          opacity: 0;
-          transform: translateY(-30px);
-          filter: blur(6px);
-          transition: all 1s cubic-bezier(0.25, 0.25, 0.25, 1);
-        }
-
-        .events-header.header-visible {
-          opacity: 1;
-          transform: translateY(0);
-          filter: blur(0px);
-        }
-
-        .section-title {
-          font-family: 'DM Serif Text', Times, serif;
-          color: #2d2d2d;
-          margin: 0 0 1rem 0;
+          top: 16px; left: 16px;
+          font-family: 'Inter', sans-serif;
+          font-size: 0.7rem;
           font-weight: 700;
-          letter-spacing: -0.5px;
-          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.05);
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: white;
+          background: var(--ec);
+          padding: 5px 12px;
+          border-radius: 999px;
+        }
+        .event-card__date {
+          position: absolute;
+          bottom: 12px; right: 16px;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          font-family: 'Inter', sans-serif;
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: white;
         }
 
-        .section-subtitle {
-          font-family: 'Segoe UI', 'Inter', -apple-system, sans-serif;
-          font-size: clamp(1rem, 2.2vw, 1.2rem);
-          color: #666;
-          max-width: 800px;
-          margin: 0 auto 2rem auto;
-          line-height: 1.6;
-          opacity: 0;
-          transition: opacity 0.8s ease 0.3s;
+        .event-card__content {
+          padding: 1.5rem 1.75rem;
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+        .event-card__location {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          font-family: 'Inter', sans-serif;
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: var(--text-muted);
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
+        }
+        .event-card__title {
+          font-family: 'Fraunces', Georgia, serif;
+          font-size: 1.3rem;
+          font-weight: 700;
+          color: var(--text-primary);
+          line-height: 1.25;
+          margin: 0;
+        }
+        .event-card__subtitle {
+          font-family: 'Inter', sans-serif;
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: var(--ec);
+          margin: 0;
+        }
+        .event-card__desc {
+          font-family: 'Inter', sans-serif;
+          font-size: 0.9rem;
+          line-height: 1.75;
+          color: var(--text-secondary);
+          margin: 0.25rem 0 0;
+          flex: 1;
+        }
+        .event-card__impact {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          background: rgba(64,58,58,0.05);
+          border-radius: 10px;
+          padding: 10px 14px;
+          font-family: 'Inter', sans-serif;
+          font-size: 0.82rem;
+          font-weight: 600;
+          color: var(--ec);
+          margin-top: auto;
         }
 
-        .events-header.header-visible .section-subtitle {
-          opacity: 1;
+        /* Gallery */
+        .rs-gallery {
+          padding-top: 0;
+        }
+        .rs-gallery__header {
+          margin-bottom: 1.5rem;
+        }
+        .rs-gallery__title {
+          font-family: 'Fraunces', Georgia, serif;
+          font-size: clamp(1.5rem, 3vw, 2rem);
+          font-weight: 700;
+          color: var(--text-primary);
+          margin-bottom: 0.35rem;
+        }
+        .rs-gallery__subtitle {
+          font-family: 'Inter', sans-serif;
+          font-size: 0.9rem;
+          color: var(--text-muted);
         }
 
-        .header-underline {
-          width: 0;
-          height: 4px;
-          background: linear-gradient(90deg, #c65d07, #e6b800, #2d7d7d);
-          margin: 0 auto;
-          border-radius: 2px;
-          transition: width 1s ease 0.6s;
-        }
-
-        .events-header.header-visible .header-underline {
-          width: 120px;
-        }
-
-        .events-grid {
+        .rs-gallery__track-wrapper {
+          overflow: hidden;
+          border-radius: 18px;
           position: relative;
+        }
+        .rs-gallery__track-wrapper::before,
+        .rs-gallery__track-wrapper::after {
+          content: '';
+          position: absolute;
+          top: 0; bottom: 0;
+          width: 80px;
           z-index: 10;
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-          gap: 3rem;
-          justify-items: center;
-          max-width: 1400px;
-          margin: 0 auto;
+          pointer-events: none;
+        }
+        .rs-gallery__track-wrapper::before {
+          left: 0;
+          background: linear-gradient(90deg, var(--bg-sand), transparent);
+        }
+        .rs-gallery__track-wrapper::after {
+          right: 0;
+          background: linear-gradient(270deg, var(--bg-sand), transparent);
         }
 
-        /* Breakpoint adjustments */
-        @media (min-width: 1024px) {
-          .events-grid {
-            grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
-            gap: 4rem;
-          }
+        .rs-gallery__track {
+          display: flex;
+          gap: 16px;
+          width: max-content;
+          animation: marquee-left 50s linear infinite;
         }
+        .rs-gallery__track:hover { animation-play-state: paused; }
 
-        @media (max-width: 1023px) {
-          .events-grid {
-            grid-template-columns: 1fr;
-            gap: 3rem;
-            max-width: 420px;
-          }
+        .rs-gallery__item {
+          flex-shrink: 0;
+          width: 280px;
+          height: 200px;
+          border-radius: 14px;
+          overflow: hidden;
+          border: 2px solid rgba(64,58,58,0.06);
+          transition: transform 0.4s var(--ease-out-expo);
+        }
+        .rs-gallery__item:hover {
+          transform: scale(1.03);
+        }
+        .rs-gallery__img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+          transition: transform 0.6s ease;
+        }
+        .rs-gallery__item:hover .rs-gallery__img {
+          transform: scale(1.08);
         }
 
         @media (max-width: 768px) {
-          .past-events-container {
-            padding: 3rem 1rem;
-          }
-
-          .events-header {
-            margin-bottom: 2rem;
-          }
-
-          .events-grid {
-            max-width: 380px;
-            gap: 2rem;
-          }
-
-          /* Show event-card carousel on small screens and hide the grid there */
-          .events-grid { display: none; } /* mobile uses carousel */
-          .events-card-carousel-container { display: block; margin-bottom: 2rem; }
-        }
-
-        @media (max-width: 480px) {
-          .past-events-container {
-            padding: 2rem 0.5rem;
-          }
-
-          .events-grid {
-            max-width: 320px;
+          .rs-events__grid {
+            grid-template-columns: 1fr;
             gap: 1.5rem;
           }
-
-          .bg-stripe {
-            height: 6vh;
-          }
+          .rs-gallery__item { width: 220px; height: 160px; }
         }
       `}</style>
-    </div>
+    </section>
   );
 };
 

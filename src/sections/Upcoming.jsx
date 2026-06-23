@@ -252,8 +252,8 @@ function Upcoming() {
     <div style={{
       minHeight: '100vh',
       padding: '2rem',
-      paddingTop: '100px',
-      background: 'linear-gradient(135deg, rgba(45, 125, 125, 0.05), rgba(196, 93, 7, 0.05))'
+      paddingTop: '80px',
+      background: 'rgba(45, 125, 125, 0.05)'
     }}>
       <motion.div
         initial={{ opacity: 0, y: 30 }}
@@ -396,7 +396,7 @@ function Upcoming() {
               No upcoming events available at the moment. Check back soon!
             </p>
           ) : (
-            <div style={{
+            <div className="rs-upcoming__grid" style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
               gap: '2rem',
@@ -484,7 +484,7 @@ function Upcoming() {
                       color: '#666',
                       marginBottom: '0.75rem'
                     }}>
-                      <strong>📅 Date:</strong> {formatEventDate(event.date)}
+                      <strong>Date:</strong> {formatEventDate(event.date)}
                     </p>
 
                     <button
@@ -492,7 +492,7 @@ function Upcoming() {
                       style={{
                         width: '100%',
                         padding: '0.75rem',
-                        background: 'linear-gradient(135deg, #c65d07, #e6b800)',
+                        background: 'var(--rs-orange)',
                         color: 'white',
                         border: 'none',
                         borderRadius: '0.5rem',
@@ -950,7 +950,7 @@ function Upcoming() {
                 style={{
                   width: '100%',
                   padding: '0.9rem 1.25rem',
-                  background: uploading ? '#ccc' : 'linear-gradient(135deg, #c65d07, #e6b800)',
+                  background: uploading ? '#ccc' : 'var(--rs-orange)',
                   color: 'white',
                   border: 'none',
                   borderRadius: '0.75rem',
@@ -967,6 +967,27 @@ function Upcoming() {
           </motion.div>
         )}
       </motion.div>
+      <style>{`
+        @media (max-width: 768px) {
+          .rs-upcoming__grid {
+            display: flex !important;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            padding-bottom: 2rem;
+            margin-left: -2rem;
+            margin-right: -2rem;
+            padding-left: 2rem;
+            padding-right: 2rem;
+            gap: 1.5rem !important;
+            scrollbar-width: none;
+          }
+          .rs-upcoming__grid::-webkit-scrollbar { display: none; }
+          .rs-upcoming__grid > div {
+            flex: 0 0 85%;
+            scroll-snap-align: center;
+          }
+        }
+      `}</style>
     </div>
   )
 }

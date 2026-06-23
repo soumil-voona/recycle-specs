@@ -189,8 +189,8 @@ function UpcomingEvent() {
     <div style={{
       minHeight: '100vh',
       padding: '2rem',
-      paddingTop: '100px',
-      background: 'linear-gradient(135deg, rgba(45, 125, 125, 0.05), rgba(196, 93, 7, 0.05))'
+      paddingTop: '80px',
+      background: 'rgba(45, 125, 125, 0.05)'
     }}>
       <motion.div
         initial={{ opacity: 0, y: 30 }}
@@ -646,7 +646,7 @@ function UpcomingEvent() {
                   padding: '0.75rem 1.5rem',
                   fontSize: '1rem',
                   fontWeight: 600,
-                  background: uploading ? '#ccc' : 'linear-gradient(135deg, #c65d07, #e6b800)',
+                  background: uploading ? '#ccc' : 'var(--rs-orange)',
                   color: '#fff',
                   border: 'none',
                   borderRadius: '0.5rem',

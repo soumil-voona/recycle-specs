@@ -97,8 +97,8 @@ function Login({ mode = 'volunteer' }) {
       alignItems: 'center',
       justifyContent: 'center',
       padding: '2rem',
-      paddingTop: '100px',
-      background: 'linear-gradient(135deg, rgba(45, 125, 125, 0.05), rgba(196, 93, 7, 0.05))'
+      paddingTop: '80px',
+      background: 'rgba(45, 125, 125, 0.05)'
     }}>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -143,7 +143,7 @@ function Login({ mode = 'volunteer' }) {
               marginBottom: '1.5rem',
               padding: '0.9rem 1rem',
               borderRadius: '0.75rem',
-              background: 'linear-gradient(135deg, rgba(45, 125, 125, 0.12), rgba(198, 93, 7, 0.12))',
+              background: 'rgba(45, 125, 125, 0.12)',
               border: '1px solid rgba(45, 125, 125, 0.2)',
               color: '#234b4b',
               fontFamily: "'Segoe UI', sans-serif",
@@ -244,7 +244,7 @@ function Login({ mode = 'volunteer' }) {
             style={{
               width: '100%',
               padding: '1rem',
-              background: loading ? '#ccc' : 'linear-gradient(135deg, #c65d07, #e6b800)',
+              background: loading ? '#ccc' : 'var(--rs-orange)',
               color: 'white',
               border: 'none',
               borderRadius: '0.75rem',
@@ -323,8 +323,40 @@ function Login({ mode = 'volunteer' }) {
           {loading ? 'Signing in...' : 'Continue with Google'}
         </button>
 
+        {!isEventLogin && (
+          <p style={{
+            marginTop: '1.5rem',
+            textAlign: 'center',
+            fontFamily: "'Segoe UI', sans-serif",
+            fontSize: '0.95rem',
+            color: '#666'
+          }}>
+            Don't have an account?{' '}
+            <span
+              role="button"
+              tabIndex={0}
+              onClick={() => navigate('/signup')}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  navigate('/signup');
+                }
+              }}
+              style={{
+                color: '#c65d07',
+                textDecoration: 'none',
+                fontWeight: 600,
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => e.target.style.textDecoration = 'underline'}
+              onMouseLeave={(e) => e.target.style.textDecoration = 'none'}
+            >
+              Sign up
+            </span>
+          </p>
+        )}
+
         <p style={{
-          marginTop: '1.5rem',
+          marginTop: isEventLogin ? '1.5rem' : '1rem',
           textAlign: 'center',
           fontFamily: "'Segoe UI', sans-serif",
           fontSize: '0.95rem',

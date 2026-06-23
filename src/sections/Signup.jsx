@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
+import { uploadToCloudinary } from '../utils/cloudinary';
 
 function Signup() {
   const [firstName, setFirstName] = useState('');
@@ -11,10 +12,41 @@ function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [chapterId, setChapterId] = useState('');
+  const [chapters, setChapters] = useState([]);
+  const [profilePic, setProfilePic] = useState(null);
+  const [profilePicPreview, setProfilePicPreview] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { signup, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchChapters = async () => {
+      try {
+        const q = query(collection(db, 'chapters'), where('approved', '==', true));
+        const snapshot = await getDocs(q);
+        const chapterList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        chapterList.sort((a, b) => a.chapterName.localeCompare(b.chapterName));
+        setChapters(chapterList);
+      } catch (err) {
+        console.error("Error fetching chapters:", err);
+      }
+    };
+    fetchChapters();
+  }, []);
+
+  function handleProfilePicChange(e) {
+    const file = e.target.files[0];
+    if (file) {
+      setProfilePic(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfilePicPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -31,9 +63,20 @@ function Signup() {
       return setError('Password must be at least 6 characters');
     }
 
+    if (!chapterId) {
+      return setError('Please select a chapter');
+    }
+
     try {
       setError('');
       setLoading(true);
+
+      let profilePicUrl = '';
+      if (profilePic) {
+        const uploadResult = await uploadToCloudinary(profilePic);
+        profilePicUrl = uploadResult.url;
+      }
+
       const userCredential = await signup(email, password);
       
       // Save user data to Firestore
@@ -41,6 +84,21 @@ function Signup() {
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         email: email,
+        chapterId: chapterId,
+        profilePictureUrl: profilePicUrl,
+        createdAt: new Date().toISOString()
+      });
+
+      // Save to volunteers collection so Chapter Admin can see them
+      await setDoc(doc(db, 'volunteers', userCredential.user.uid), {
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        email: email,
+        school: 'N/A', // Default values since not prompted
+        grade: 'N/A',
+        chapterId: chapterId,
+        volunteerHours: 0,
+        profilePictureUrl: profilePicUrl,
         createdAt: new Date().toISOString()
       });
       
@@ -62,6 +120,10 @@ function Signup() {
   }
 
   async function handleGoogleSignIn() {
+    if (!chapterId) {
+      return setError('Please select a chapter before continuing with Google.');
+    }
+
     try {
       setError('');
       setLoading(true);
@@ -78,8 +140,23 @@ function Signup() {
         firstName: firstName,
         lastName: lastName,
         email: user.email,
+        chapterId: chapterId,
+        profilePictureUrl: user.photoURL || '',
         createdAt: new Date().toISOString()
       }, { merge: true }); // merge: true to not overwrite if user already exists
+
+      // Save to volunteers collection so Chapter Admin can see them
+      await setDoc(doc(db, 'volunteers', user.uid), {
+        firstName: firstName,
+        lastName: lastName,
+        email: user.email,
+        school: 'N/A',
+        grade: 'N/A',
+        chapterId: chapterId,
+        volunteerHours: 0,
+        profilePictureUrl: user.photoURL || '',
+        createdAt: new Date().toISOString()
+      }, { merge: true });
       
       navigate('/volunteers');
     } catch (error) {
@@ -96,8 +173,8 @@ function Signup() {
       alignItems: 'center',
       justifyContent: 'center',
       padding: '2rem',
-      paddingTop: '100px',
-      background: 'linear-gradient(135deg, rgba(45, 125, 125, 0.05), rgba(196, 93, 7, 0.05))'
+      paddingTop: '80px',
+      background: 'rgba(45, 125, 125, 0.05)'
     }}>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -151,6 +228,51 @@ function Signup() {
         )}
 
         <form onSubmit={handleSubmit}>
+          {/* Profile Picture Upload */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <div style={{
+              position: 'relative',
+              width: '100px',
+              height: '100px',
+              borderRadius: '50%',
+              overflow: 'hidden',
+              background: '#f0f0f0',
+              border: '2px dashed #ccc',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              marginBottom: '0.5rem'
+            }}>
+              {profilePicPreview ? (
+                <img src={profilePicPreview} alt="Profile Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleProfilePicChange}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  opacity: 0,
+                  cursor: 'pointer'
+                }}
+              />
+            </div>
+            <span style={{ fontFamily: "'Segoe UI', sans-serif", fontSize: '0.85rem', color: '#666' }}>
+              Upload Profile Picture (Optional)
+            </span>
+          </div>
+
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
             <div>
               <label style={{
@@ -277,7 +399,7 @@ function Signup() {
             />
           </div>
 
-          <div style={{ marginBottom: '2rem' }}>
+          <div style={{ marginBottom: '1.5rem' }}>
             <label style={{
               display: 'block',
               fontFamily: "'Segoe UI', sans-serif",
@@ -308,13 +430,53 @@ function Signup() {
             />
           </div>
 
+          <div style={{ marginBottom: '2rem' }}>
+            <label style={{
+              display: 'block',
+              fontFamily: "'Segoe UI', sans-serif",
+              fontSize: '0.9rem',
+              fontWeight: 600,
+              color: '#333',
+              marginBottom: '0.5rem'
+            }}>
+              Select Chapter
+            </label>
+            <select
+              value={chapterId}
+              onChange={(e) => setChapterId(e.target.value)}
+              required
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                borderRadius: '0.5rem',
+                border: '2px solid #e0e0e0',
+                fontSize: '1rem',
+                fontFamily: "'Segoe UI', sans-serif",
+                transition: 'border-color 0.3s ease',
+                boxSizing: 'border-box',
+                backgroundColor: 'white',
+                color: chapterId ? '#333' : '#999',
+                cursor: 'pointer'
+              }}
+              onFocus={(e) => e.target.style.borderColor = '#c65d07'}
+              onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
+            >
+              <option value="" disabled>Select your local chapter</option>
+              {chapters.map(chapter => (
+                <option key={chapter.id} value={chapter.id} style={{ color: '#333' }}>
+                  {chapter.chapterName}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <button
             type="submit"
             disabled={loading}
             style={{
               width: '100%',
               padding: '1rem',
-              background: loading ? '#ccc' : 'linear-gradient(135deg, #c65d07, #e6b800)',
+              background: loading ? '#ccc' : 'var(--rs-orange)',
               color: 'white',
               border: 'none',
               borderRadius: '0.75rem',

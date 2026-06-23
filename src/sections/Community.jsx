@@ -52,7 +52,7 @@ const Community = () => {
           opacity: 0;
           transform: translateY(30px);
           transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-          background: linear-gradient(135deg, rgba(45, 125, 125, 0.06), rgba(139, 91, 168, 0.08));
+          background: rgba(45, 125, 125, 0.05);
         }
 
         .community-page.visible {
@@ -60,13 +60,7 @@ const Community = () => {
           transform: translateY(0);
         }
 
-        .bg-decoration {
-          position: absolute;
-          inset: 0;
-          overflow: hidden;
-          opacity: 0.16;
-          pointer-events: none;
-        }
+        display: none;
 
         .bg-stripe {
           position: absolute;
@@ -76,10 +70,10 @@ const Community = () => {
           transform-origin: center;
         }
 
-        .bg-stripe-1 { top: 12%; background: linear-gradient(45deg, #21544e, transparent); transform: rotate(-15deg); }
-        .bg-stripe-2 { top: 28%; background: linear-gradient(45deg, #c65d07, transparent); transform: rotate(15deg); }
-        .bg-stripe-3 { top: 44%; background: linear-gradient(45deg, #8b5ba8, transparent); transform: rotate(-15deg); }
-        .bg-stripe-4 { top: 60%; background: linear-gradient(45deg, #e6b800, transparent); transform: rotate(15deg); }
+        .bg-stripe-1 { display: none; }
+        .bg-stripe-2 { display: none; }
+        .bg-stripe-3 { display: none; }
+        .bg-stripe-4 { display: none; }
 
         .community-shell {
           position: relative;
@@ -148,7 +142,7 @@ const Community = () => {
           height: 0.8rem;
           border-radius: 999px;
           margin-top: 0.35rem;
-          background: linear-gradient(135deg, #8b5ba8, #c65d07);
+          background: #8b5ba8;
           flex: 0 0 auto;
         }
 
