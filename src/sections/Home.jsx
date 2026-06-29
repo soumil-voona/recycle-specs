@@ -119,46 +119,59 @@ const Home = () => {
           transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
         >
           <div className="rs-hero__frame-outer">
-            <div className="rs-hero__frame-inner">
-              <motion.img
-                src="/imgs/event1.jpg"
-                alt="RecycleSpecs team conducting an eye screening drive in Guntur, India"
-                className="rs-hero__img"
-                style={{ y: bgY }}
-              />
-              <div className="rs-hero__frame-overlay" />
+            {/* Bold Mission Statement Banner */}
+            <motion.div
+              className="rs-hero__mission-banner"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.6 }}
+            >
+              <div className="mission-banner__label">Mission Statement</div>
+              <div className="mission-banner__text">Funding Change,<br/>Transforming Vision</div>
+            </motion.div>
+
+            <div className="rs-hero__image-wrap">
+              <div className="rs-hero__frame-inner">
+                <motion.img
+                  src="/imgs/event1.jpg"
+                  alt="RecycleSpecs team conducting an eye screening drive in Guntur, India"
+                  className="rs-hero__img"
+                  style={{ y: bgY }}
+                />
+                <div className="rs-hero__frame-overlay" />
+              </div>
+              {/* Floating badges */}
+              <motion.div
+                className="rs-hero__badge badge-tl"
+                initial={{ opacity: 0, x: -30, y: -20 }}
+                animate={{ opacity: 1, x: 0, y: 0 }}
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.8 }}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="2"/>
+                  <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                <div>
+                  <div className="badge-num">595+</div>
+                  <div className="badge-label">People Served</div>
+                </div>
+              </motion.div>
+              <motion.div
+                className="rs-hero__badge badge-br"
+                initial={{ opacity: 0, x: 30, y: 20 }}
+                animate={{ opacity: 1, x: 0, y: 0 }}
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 1.0 }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--rs-teal)' }}>
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <div>
+                  <div className="badge-num">100%</div>
+                  <div className="badge-label">Youth-Led</div>
+                </div>
+              </motion.div>
             </div>
-            {/* Floating badges */}
-            <motion.div
-              className="rs-hero__badge badge-tl"
-              initial={{ opacity: 0, x: -30, y: -20 }}
-              animate={{ opacity: 1, x: 0, y: 0 }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.8 }}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="2"/>
-                <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              <div>
-                <div className="badge-num">595+</div>
-                <div className="badge-label">People Served</div>
-              </div>
-            </motion.div>
-            <motion.div
-              className="rs-hero__badge badge-br"
-              initial={{ opacity: 0, x: 30, y: 20 }}
-              animate={{ opacity: 1, x: 0, y: 0 }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 1.0 }}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--rs-teal)' }}>
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                <circle cx="12" cy="12" r="3"></circle>
-              </svg>
-              <div>
-                <div className="badge-num">100%</div>
-                <div className="badge-label">Youth-Led</div>
-              </div>
-            </motion.div>
           </div>
         </motion.div>
       </motion.div>
@@ -310,6 +323,60 @@ const Home = () => {
           position: relative;
           width: 100%;
           max-width: 540px;
+        }
+
+        .rs-hero__mission-banner {
+          background: var(--rs-orange);
+          color: white;
+          padding: 12px 20px;
+          border-radius: var(--radius-md);
+          margin-bottom: 44px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 16px;
+          font-family: var(--font-body);
+          box-shadow: var(--shadow-lg), 0 10px 30px rgba(198,93,7,0.25);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          position: relative;
+          z-index: 10;
+        }
+        .mission-banner__label {
+          text-transform: uppercase;
+          font-size: 0.68rem;
+          font-weight: 800;
+          letter-spacing: 0.15em;
+          color: rgba(255, 255, 255, 0.85);
+          background: rgba(255, 255, 255, 0.15);
+          padding: 4px 10px;
+          border-radius: 6px;
+          flex-shrink: 0;
+        }
+        .mission-banner__text {
+          font-family: var(--font-display);
+          font-size: 1.15rem;
+          font-weight: 700;
+          letter-spacing: -0.01em;
+          text-align: right;
+          color: white;
+        }
+        @media (max-width: 480px) {
+          .rs-hero__mission-banner {
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            text-align: center;
+            padding: 10px 14px;
+          }
+          .mission-banner__text {
+            font-size: 0.95rem;
+            text-align: center;
+          }
+        }
+
+        .rs-hero__image-wrap {
+          position: relative;
+          width: 100%;
         }
 
         .rs-hero__frame-inner {

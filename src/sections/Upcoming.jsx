@@ -88,7 +88,12 @@ function Upcoming() {
   useEffect(() => {
     async function fetchEvents() {
       try {
-        const eventsQuery = query(collection(db, 'upcomingEvents'), orderBy('date', 'asc'))
+        const eventsQuery = query(
+          collection(db, 'events'),
+          where('eventType', '==', 'public'),
+          where('approvalStatus', '==', 'approved'),
+          orderBy('date', 'asc')
+        )
         const eventsSnapshot = await getDocs(eventsQuery)
         const today = new Date()
         today.setHours(0, 0, 0, 0)
@@ -133,7 +138,7 @@ function Upcoming() {
     }
 
     try {
-      await deleteDoc(doc(db, 'upcomingEvents', eventPath))
+      await deleteDoc(doc(db, 'events', eventPath))
       setEvents((prevEvents) => prevEvents.filter((event) => event.path !== eventPath))
     } catch (error) {
       console.error('Error deleting event:', error)
@@ -177,7 +182,7 @@ function Upcoming() {
         return
       }
 
-      const eventRef = doc(db, 'upcomingEvents', normalizedPath)
+      const eventRef = doc(db, 'events', normalizedPath)
       const existingEvent = await getDoc(eventRef)
       if (existingEvent.exists()) {
         setUploadMessage('That path already exists. Please choose a different one.')
@@ -201,6 +206,8 @@ function Upcoming() {
         description: eventDescription.trim(),
         imageUrl: uploadResult.url,
         imagePublicId: uploadResult.publicId,
+        eventType: 'public',
+        approvalStatus: 'approved', // Or depending on rules
         createdAt: new Date().toISOString(),
         createdBy: currentUser.uid
       })

@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'motion/react';
+import { useAuth } from '../contexts/AuthContext';
 
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { currentUser, userData, logout } = useAuth();
 
   // Force solid navbar on pages with dark backgrounds like /chapters
   const isDarkPage = 
@@ -33,16 +35,29 @@ const Navbar = () => {
     return () => { document.body.style.overflow = ''; };
   }, [mobileMenuOpen]);
 
-  const navItems = [
+  const baseNavItems = [
     { name: 'Our Story',   targetId: 'about' },
     { name: 'Team',        targetId: 'board' },
     { name: 'Impact',      targetId: 'events' },
     { name: 'Partners',    targetId: 'partnerships' },
     { name: 'Journey',     targetId: 'timeline' },
     { name: 'Upcoming',    route: '/upcoming' },
-    { name: 'Chapters',    route: '/chapters' },
-    { name: 'Volunteer',   route: '/volunteers' },
   ];
+
+  let navItems = [...baseNavItems];
+
+  if (currentUser) {
+    navItems.push({ name: 'Volunteer', route: '/volunteers' });
+    if (userData?.chapterLead || userData?.foundingMember) {
+      navItems.push({ name: 'Chapter Dashboard', route: '/chapters/dashboard' });
+    }
+    if (userData?.foundingMember) {
+      navItems.push({ name: 'Admin', route: '/hq-admin' });
+    }
+    navItems.push({ name: 'Logout', action: 'logout' });
+  } else {
+    navItems.push({ name: 'Login', route: '/login' });
+  }
 
   const scrollToSection = (id) => {
     const el = document.getElementById(id);
@@ -52,8 +67,15 @@ const Navbar = () => {
     window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - offset, behavior: 'smooth' });
   };
 
-  const handleNavClick = (item) => {
+  const handleNavClick = async (item) => {
     setMobileMenuOpen(false);
+    
+    if (item.action === 'logout') {
+      await logout();
+      navigate('/');
+      return;
+    }
+
     setTimeout(() => {
       if (item.route) {
         navigate(item.route);
@@ -203,25 +225,16 @@ const Navbar = () => {
           z-index: 900;
           transition: background 0.4s ease, box-shadow 0.4s ease, padding 0.3s ease;
           padding: 0 clamp(1rem, 4vw, 3rem);
+          box-shadow: 0 1px 0 rgba(64,58,58,0.08), 0 8px 32px rgba(64,58,58,0.06);
         }
 
         .rs-navbar::before {
           content: '';
           position: absolute;
           inset: 0;
-          background: rgba(245, 240, 232, 0.0);
-          backdrop-filter: blur(0px);
-          transition: background 0.4s ease, backdrop-filter 0.4s ease;
-          z-index: -1;
-        }
-
-        .rs-navbar.scrolled::before {
-          background: rgba(245, 240, 232, 0.95);
+          background: var(--bg-cream);
           backdrop-filter: blur(20px);
-        }
-
-        .rs-navbar.scrolled {
-          box-shadow: 0 1px 0 rgba(64,58,58,0.08), 0 8px 32px rgba(64,58,58,0.06);
+          z-index: -1;
         }
 
         .rs-navbar__inner {

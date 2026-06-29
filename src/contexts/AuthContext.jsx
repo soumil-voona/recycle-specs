@@ -7,7 +7,8 @@ import {
   GoogleAuthProvider,
   signInWithPopup
 } from 'firebase/auth';
-import { auth } from '../firebase';
+import { auth, db } from '../firebase';
+import { doc, onSnapshot } from 'firebase/firestore';
 
 const AuthContext = createContext();
 
@@ -17,6 +18,7 @@ export function useAuth() {
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
+  const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   function signup(email, password) {
@@ -37,16 +39,46 @@ export function AuthProvider({ children }) {
   }
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    let unsubscribeSnapshot = null;
+
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
-      setLoading(false);
+      
+      if (user) {
+        // Fetch user data from Firestore
+        const userRef = doc(db, 'users', user.uid);
+        unsubscribeSnapshot = onSnapshot(userRef, (docSnap) => {
+          if (docSnap.exists()) {
+            setUserData(docSnap.data());
+          } else {
+            setUserData(null);
+          }
+          setLoading(false);
+        }, (error) => {
+          console.error("Error fetching user data:", error);
+          setUserData(null);
+          setLoading(false);
+        });
+      } else {
+        setUserData(null);
+        setLoading(false);
+        if (unsubscribeSnapshot) {
+          unsubscribeSnapshot();
+        }
+      }
     });
 
-    return unsubscribe;
+    return () => {
+      unsubscribeAuth();
+      if (unsubscribeSnapshot) {
+        unsubscribeSnapshot();
+      }
+    };
   }, []);
 
   const value = {
     currentUser,
+    userData,
     signup,
     login,
     logout,

@@ -25,6 +25,7 @@ import ChapterAdminLogin from './sections/ChapterAdminLogin'
 import UnlistedChapterSignup from './sections/UnlistedChapterSignup'
 import ChapterDashboard from './sections/ChapterDashboard'
 import HQAdminPanel from './sections/HQAdminPanel'
+import HomePopup from './components/HomePopup'
 
 /* ─────────────────────────────────────
    Global scroll-reveal observer
@@ -501,6 +502,7 @@ const HomePage = () => {
 
   return (
     <div>
+      <HomePopup />
       <Home />
       <TheReality />
       <AboutUs />
@@ -527,27 +529,32 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<Navigate to="/volunteer-login" replace />} />
-        <Route path="/volunteer-login" element={<Login mode="volunteer" />} />
-        <Route path="/event-login" element={<Login mode="event" />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/upcoming" element={<Upcoming />} />
         <Route path="/upcoming/:eventPath" element={<UpcomingEvent />} />
-        <Route path="/community" element={<Navigate to="/upcoming" replace />} />
         <Route
           path="/volunteers"
           element={
-            <ProtectedRoute message="Log in to access the volunteer dashboard." redirectTo="/volunteer-login">
+            <ProtectedRoute message="Log in to access the volunteer dashboard." redirectTo="/login">
               <Volunteers />
             </ProtectedRoute>
           }
         />
         <Route path="/chapters" element={<Chapters />} />
-        <Route path="/chapters/signup" element={<VolunteerSignup />} />
+        <Route path="/chapters/signup" element={<Signup />} />
         <Route path="/chapters/admin-login" element={<ChapterAdminLogin />} />
-        <Route path="/chapters/dashboard" element={<ChapterDashboard />} />
+        <Route path="/chapters/dashboard" element={
+            <ProtectedRoute message="Log in to access the chapter dashboard." redirectTo="/login" requireChapterLead={true}>
+              <ChapterDashboard />
+            </ProtectedRoute>
+        } />
         <Route path="/unlisted-chapter-signup" element={<UnlistedChapterSignup />} />
-        <Route path="/hq-admin" element={<HQAdminPanel />} />
+        <Route path="/hq-admin" element={
+            <ProtectedRoute message="Log in to access the admin panel." redirectTo="/login" requireFoundingMember={true}>
+              <HQAdminPanel />
+            </ProtectedRoute>
+        } />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <Analytics />

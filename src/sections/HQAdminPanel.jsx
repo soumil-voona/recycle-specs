@@ -1,34 +1,52 @@
 import React, { useState, useEffect } from 'react';
 import { collection, query, getDocs, updateDoc, doc } from 'firebase/firestore';
-import { db, auth } from '../firebase';
+import { db } from '../firebase';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 const HQAdminPanel = () => {
   const navigate = useNavigate();
+  const { currentUser, userData } = useAuth();
   const [chapters, setChapters] = useState([]);
   const [stats, setStats] = useState({ volunteers: 0, hours: 0, events: 0, impact: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchHQData = async () => {
-      // In a real app, verify user's admin claim/document.
-      // Assuming route is protected.
+      if (!currentUser) {
+        navigate('/login');
+        return;
+      }
+      if (!userData) return;
+      if (!userData.foundingMember) {
+        navigate('/');
+        return;
+      }
       try {
-        const chaptersSnap = await getDocs(collection(db, 'chapters'));
-        const chaptersList = chaptersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-        setChapters(chaptersList);
+        const usersSnap = await getDocs(collection(db, 'users'));
+        const usersList = usersSnap.docs.map(d => d.data());
 
-        const volunteersSnap = await getDocs(collection(db, 'volunteers'));
-        const volunteersList = volunteersSnap.docs.map(d => d.data());
+        const chaptersSnap = await getDocs(collection(db, 'chapters'));
+        const chaptersList = chaptersSnap.docs.map(d => {
+          const data = d.data();
+          const president = usersList.find(u => u.uid === data.presidentUid) || {};
+          return {
+            id: d.id,
+            ...data,
+            presidentName: president.name || 'Unknown',
+            presidentEmail: president.email || 'Unknown'
+          };
+        });
+        setChapters(chaptersList);
 
         const eventsSnap = await getDocs(collection(db, 'events'));
         const eventsList = eventsSnap.docs.map(d => d.data());
 
-        const totalHours = volunteersList.reduce((sum, v) => sum + (Number(v.volunteerHours) || 0), 0);
+        const totalHours = usersList.reduce((sum, v) => sum + (Number(v.volunteerHours) || 0), 0);
         const totalImpact = eventsList.reduce((sum, e) => sum + (Number(e.peopleReached) || 0), 0);
 
         setStats({
-          volunteers: volunteersList.length,
+          volunteers: usersList.length,
           hours: totalHours,
           events: eventsList.length,
           impact: totalImpact
@@ -40,7 +58,7 @@ const HQAdminPanel = () => {
       }
     };
     fetchHQData();
-  }, []);
+  }, [currentUser, userData, navigate]);
 
   const toggleApproval = async (chapterId, currentStatus) => {
     try {
@@ -65,7 +83,7 @@ const HQAdminPanel = () => {
     <div className="rs-hq-admin">
       <div className="rs-hq-admin__inner">
         <header className="rs-hq-admin__header">
-          <h1>RecycleSpecs HQ Admin</h1>
+          <h1 style={{ color: "white" }}>RecycleSpecs HQ Admin</h1>
           <button className="rs-btn-gold" onClick={copyInviteLink}>Copy Signup Invitation Link</button>
         </header>
 
@@ -105,7 +123,7 @@ const HQAdminPanel = () => {
               <tbody>
                 {chapters.map(c => (
                   <tr key={c.id}>
-                    <td>{c.chapterName}</td>
+                    <td>{c.displayName || c.chapterName}</td>
                     <td>{c.presidentName}</td>
                     <td>{c.presidentEmail}</td>
                     <td>{c.createdAt ? new Date(c.createdAt).toLocaleDateString() : 'N/A'}</td>

@@ -2,18 +2,15 @@ import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import { collection, setDoc, doc } from 'firebase/firestore';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { db, auth } from '../firebase';
+import { db } from '../firebase';
 
 const UnlistedChapterSignup = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    chapterName: '',
+    chapterUsername: '',
+    displayName: '',
     schoolName: '',
-    presidentName: '',
-    presidentEmail: '',
-    password: '',
-    confirmPassword: ''
+    leadEmails: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -21,46 +18,40 @@ const UnlistedChapterSignup = () => {
 
   const handleChange = (e) => {
     let { name, value } = e.target;
-    if (name === 'chapterName') {
-      value = value.replace(/\s+/g, '');
+    if (name === 'chapterUsername') {
+      value = value.toLowerCase().replace(/[^a-z0-9-]/g, '');
     }
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const getDummyEmail = (chapterName) => {
-    const cleanName = chapterName.toLowerCase().replace(/[^a-z0-9]/g, '');
-    return `${cleanName}@chapters.recyclespecs.org`;
-  };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
+
 
     setLoading(true);
 
     try {
-      // 1. Create auth user with dummy email
-      const dummyEmail = getDummyEmail(formData.chapterName);
-      const userCredential = await createUserWithEmailAndPassword(auth, dummyEmail, formData.password);
-      const user = userCredential.user;
+      const isCoppell = formData.chapterUsername === 'coppell';
 
-      // 2. Save to chapters collection using user.uid as chapter document ID
-      await setDoc(doc(db, 'chapters', user.uid), {
-        chapterName: formData.chapterName,
+      // Save to chapters collection
+      await setDoc(doc(db, 'chapters', formData.chapterUsername), {
+        username: formData.chapterUsername,
+        displayName: formData.displayName,
         schoolName: formData.schoolName,
-        presidentName: formData.presidentName,
-        presidentEmail: formData.presidentEmail,
+        presidentUid: '', // Will be dynamically linked when the first lead signs up/logs in
+        leadUids: [],
+        leadEmailsPending: formData.leadEmails,
+        foundingChapter: isCoppell,
         approved: true,
         createdAt: new Date().toISOString()
       });
 
       setSuccess(true);
-      setTimeout(() => navigate('/chapters/admin-login'), 3000);
+      setTimeout(() => navigate('/login'), 3000);
     } catch (err) {
       setError(err.message || 'Failed to register chapter.');
     } finally {
@@ -95,9 +86,15 @@ const UnlistedChapterSignup = () => {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="rs-uc-signup__form">
-              <div className="rs-uc-signup__field">
-                <label>Chapter Name (e.g. coppell)</label>
-                <input type="text" name="chapterName" required value={formData.chapterName} onChange={handleChange} />
+              <div className="rs-uc-signup__row">
+                <div className="rs-uc-signup__field">
+                  <label>Chapter Username (unique, min 6 chars, e.g. coppell)</label>
+                  <input type="text" name="chapterUsername" required minLength="6" value={formData.chapterUsername} onChange={handleChange} />
+                </div>
+                <div className="rs-uc-signup__field">
+                  <label>Chapter Display Name</label>
+                  <input type="text" name="displayName" required value={formData.displayName} onChange={handleChange} />
+                </div>
               </div>
 
               <div className="rs-uc-signup__field">
@@ -105,27 +102,14 @@ const UnlistedChapterSignup = () => {
                 <input type="text" name="schoolName" required value={formData.schoolName} onChange={handleChange} />
               </div>
 
-              <div className="rs-uc-signup__row">
-                <div className="rs-uc-signup__field">
-                  <label>President Name</label>
-                  <input type="text" name="presidentName" required value={formData.presidentName} onChange={handleChange} />
-                </div>
-                <div className="rs-uc-signup__field">
-                  <label>President Email</label>
-                  <input type="email" name="presidentEmail" required value={formData.presidentEmail} onChange={handleChange} />
-                </div>
+              <div className="rs-uc-signup__field">
+                <label>Lead Team Emails (comma separated)</label>
+                <input type="text" name="leadEmails" value={formData.leadEmails} onChange={handleChange} placeholder="lead1@example.com, lead2@example.com" />
               </div>
 
-              <div className="rs-uc-signup__row">
-                <div className="rs-uc-signup__field">
-                  <label>Password</label>
-                  <input type="password" name="password" required minLength="6" value={formData.password} onChange={handleChange} />
-                </div>
-                <div className="rs-uc-signup__field">
-                  <label>Confirm Password</label>
-                  <input type="password" name="confirmPassword" required minLength="6" value={formData.confirmPassword} onChange={handleChange} />
-                </div>
-              </div>
+
+
+
 
               <button type="submit" className="rs-uc-signup__btn" disabled={loading}>
                 {loading ? 'Registering...' : 'Register Chapter'}

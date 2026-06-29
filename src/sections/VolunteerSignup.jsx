@@ -26,8 +26,8 @@ const VolunteerSignup = () => {
         const q = query(collection(db, 'chapters'), where('approved', '==', true));
         const snapshot = await getDocs(q);
         const chapterList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        // Sort alphabetically by chapterName
-        chapterList.sort((a, b) => a.chapterName.localeCompare(b.chapterName));
+        // Sort alphabetically by chapter name with fallbacks
+        chapterList.sort((a, b) => (a.displayName || a.chapterName || a.id || '').localeCompare(b.displayName || b.chapterName || b.id || ''));
         setChapters(chapterList);
       } catch (err) {
         console.error("Error fetching chapters:", err);
@@ -138,7 +138,7 @@ const VolunteerSignup = () => {
                 <option value="" disabled>Select your local chapter</option>
                 {chapters.map(chapter => (
                   <option key={chapter.id} value={chapter.id}>
-                    {chapter.chapterName}
+                    {chapter.displayName || chapter.chapterName || chapter.id}
                   </option>
                 ))}
               </select>

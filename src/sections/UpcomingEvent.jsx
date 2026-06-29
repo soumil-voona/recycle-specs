@@ -86,7 +86,7 @@ function UpcomingEvent() {
       }
 
       try {
-        const eventDoc = await getDoc(doc(db, 'upcomingEvents', eventPath))
+        const eventDoc = await getDoc(doc(db, 'events', eventPath))
         if (!eventDoc.exists()) {
           setError('Event not found.')
           return

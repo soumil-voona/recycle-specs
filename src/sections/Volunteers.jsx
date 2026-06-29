@@ -100,7 +100,12 @@ function Volunteers() {
   useEffect(() => {
     async function fetchEvents() {
       try {
-        const eventsQuery = query(collection(db, 'events'), orderBy('date', 'asc'));
+        const eventsQuery = query(
+          collection(db, 'events'), 
+          where('eventType', '==', 'volunteer'),
+          where('approvalStatus', '==', 'approved'),
+          orderBy('date', 'asc')
+        );
         const eventsSnapshot = await getDocs(eventsQuery);
         const eventsList = eventsSnapshot.docs.map(doc => ({
           id: doc.id,
@@ -678,7 +683,7 @@ function Volunteers() {
             }}>
               {events.map((event) => {
                 const eventSignups = volunteerSignups[event.id] || [];
-                const isSignedUp = eventSignups.some(signup => signup.uid === currentUser.uid);
+                const isSignedUp = eventSignups.some(signup => signup.uid === currentUser?.uid);
                 const signupCount = eventSignups.length;
                 const isFull = event.capacity !== 'unlimited' && signupCount >= event.capacity;
                 

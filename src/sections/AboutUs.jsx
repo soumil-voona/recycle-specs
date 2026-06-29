@@ -218,6 +218,14 @@ const AboutUs = () => {
     <section className="rs-about" id="about">
       {/* Section intro */}
       <div className="rs-about__header" ref={headerRef}>
+        <motion.div
+          className="rs-about__mission-tag"
+          initial={{ opacity: 0, y: 15 }}
+          animate={isHeaderInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        >
+          Our Core Intentions
+        </motion.div>
 
         <motion.h2
           className="section-title"
@@ -233,7 +241,7 @@ const AboutUs = () => {
           animate={isHeaderInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
         >
-          RecycleSpecs was founded by high school students who believe that quality vision care is a right, not a privilege. We're changing that — one pair of glasses at a time.
+          Our goal is to help reduce global disparities in vision by funding surgeries and screenings, and raising awareness of racism and classism in optical health.
         </motion.p>
       </div>
 
@@ -260,30 +268,66 @@ const AboutUs = () => {
         <div className="rs-about__cards">
           {[
             {
-              icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>,
-              title: 'Our Mission',
-              content: 'Funding change, transforming vision. We raise awareness, collect glasses, and organize screenings to ensure communities worldwide can access the eye care they deserve.',
+              icon: (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                </svg>
+              ),
+              title: 'Free Screenings',
+              content: 'Fundraising to provide free screenings by partnering with eye clinics in the US and India, ensuring early detection and care.',
               color: 'var(--rs-teal)',
               bg: 'rgba(45,125,125,0.06)',
               border: 'rgba(45,125,125,0.15)',
             },
             {
-              icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>,
-              title: 'Our Approach',
-              content: 'We host fundraisers where all proceeds go to organizing screenings in marginalized areas, while collecting old lenses and glasses to donate to communities in need.',
+              icon: (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              ),
+              title: 'Glasses & Donations',
+              content: 'Collecting glasses and encouraging donations of gently used frames to match prescriptions and support outreach.',
               color: 'var(--rs-orange)',
               bg: 'rgba(198,93,7,0.06)',
               border: 'rgba(198,93,7,0.15)',
+            },
+            {
+              icon: (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                </svg>
+              ),
+              title: 'Youth Awareness',
+              content: 'Spreading awareness on vision health for young people, while confronting systemic barriers like racism and classism in optical health.',
+              color: 'var(--rs-gold)',
+              bg: 'rgba(212,160,23,0.06)',
+              border: 'rgba(212,160,23,0.15)',
+            },
+            {
+              icon: (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="2" y1="12" x2="22" y2="12"/>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+              ),
+              title: 'School Chapters',
+              content: 'Setting up chapters in schools around the DFW area, then expanding across the United States and other countries.',
+              color: 'var(--rs-teal)',
+              bg: 'rgba(45,125,125,0.06)',
+              border: 'rgba(45,125,125,0.15)',
             },
           ].map((card, i) => (
             <motion.div
               key={card.title}
               className="rs-about__card"
               style={{ '--accent': card.color, '--bg': card.bg, '--border': card.border }}
-              initial={{ opacity: 0, x: 50 }}
-              animate={isGridInView ? { opacity: 1, x: 0 } : {}}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: i * 0.15 + 0.1 }}
-              whileHover={{ x: 6, transition: { duration: 0.3 } }}
+              initial={{ opacity: 0, x: 30, y: 20 }}
+              animate={isGridInView ? { opacity: 1, x: 0, y: 0 } : {}}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: i * 0.12 + 0.1 }}
+              whileHover={{ y: -4, transition: { duration: 0.3 } }}
             >
               <div className="rs-about__card-icon" style={{ color: card.color }}>{card.icon}</div>
               <div>
@@ -332,11 +376,27 @@ const AboutUs = () => {
           margin: 0 auto 3rem;
         }
 
+        .rs-about__mission-tag {
+          display: inline-flex;
+          align-items: center;
+          font-family: 'Inter', sans-serif;
+          font-size: 0.72rem;
+          font-weight: 700;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: var(--rs-orange);
+          background: rgba(198,93,7,0.08);
+          border: 1px solid rgba(198,93,7,0.15);
+          padding: 6px 16px;
+          border-radius: var(--radius-full);
+          margin-bottom: 1.25rem;
+        }
+
         .rs-about__grid {
           max-width: 1280px;
           margin: 0 auto 4rem;
           display: grid;
-          grid-template-columns: 1fr 1fr;
+          grid-template-columns: 1fr 1.3fr;
           gap: clamp(1.5rem, 4vw, 3rem);
           align-items: center;
         }
@@ -372,8 +432,8 @@ const AboutUs = () => {
         }
 
         .rs-about__cards {
-          display: flex;
-          flex-direction: column;
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
           gap: 1.25rem;
         }
         .rs-about__card {
@@ -381,33 +441,37 @@ const AboutUs = () => {
           border: 1px solid var(--border);
           border-left: 4px solid var(--accent);
           border-radius: 16px;
-          padding: 1.5rem 1.75rem;
+          padding: 1.25rem 1.5rem;
           display: flex;
           gap: 1rem;
           align-items: flex-start;
           cursor: default;
-          transition: box-shadow 0.3s ease;
+          transition: all 0.3s ease;
         }
         .rs-about__card:hover {
           box-shadow: var(--shadow-md);
+          transform: translateY(-4px);
         }
         .rs-about__card-icon {
           font-size: 1.6rem;
           flex-shrink: 0;
           margin-top: 2px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
         .rs-about__card-title {
           font-family: 'Fraunces', Georgia, serif;
-          font-size: 1.25rem;
+          font-size: 1.15rem;
           font-weight: 700;
           color: var(--accent);
-          margin-bottom: 0.5rem;
+          margin-bottom: 0.4rem;
         }
         .rs-about__card-body {
           font-family: 'Inter', sans-serif;
-          font-size: 0.95rem;
+          font-size: 0.88rem;
           color: var(--text-secondary);
-          line-height: 1.75;
+          line-height: 1.6;
           margin: 0;
         }
 
@@ -502,6 +566,9 @@ const AboutUs = () => {
           .rs-about__impact-grid {
             grid-template-columns: 1fr;
             gap: 1rem;
+          }
+          .rs-about__cards {
+            grid-template-columns: 1fr;
           }
         }
       `}</style>

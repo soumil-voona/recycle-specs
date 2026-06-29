@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { collection, query, where, getDocs, addDoc } from 'firebase/firestore';
-import { db, auth } from '../firebase';
+import { collection, query, where, getDocs, getDoc, doc, addDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 import { uploadToCloudinary } from '../utils/cloudinary';
+import { useAuth } from '../contexts/AuthContext';
 
 const ChapterDashboard = () => {
   const navigate = useNavigate();
@@ -14,31 +15,40 @@ const ChapterDashboard = () => {
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const { currentUser, userData, logout } = useAuth();
+
   useEffect(() => {
     const fetchDashboardData = async () => {
-      const user = auth.currentUser;
-      if (!user) {
-        navigate('/chapters/admin-login');
+      if (!currentUser) {
+        navigate('/login');
+        return;
+      }
+
+      if (!userData) {
+        return; // Wait for userData to load
+      }
+
+      if (!userData.chapterLead && !userData.foundingMember) {
+        navigate('/');
         return;
       }
 
       try {
-        // Fetch Chapter Profile (document ID is user.uid)
-        const chapterRef = collection(db, 'chapters');
-        const q = query(chapterRef, where('__name__', '==', user.uid));
-        const chapterSnap = await getDocs(q);
+        // Fetch Chapter Profile
+        const chapterRef = doc(db, 'chapters', userData.chapterId);
+        const chapterSnap = await getDoc(chapterRef);
         
-        if (!chapterSnap.empty) {
-          setChapterData({ id: chapterSnap.docs[0].id, ...chapterSnap.docs[0].data() });
+        if (chapterSnap.exists()) {
+          setChapterData({ id: chapterSnap.id, ...chapterSnap.data() });
         }
 
         // Fetch Members
-        const membersQ = query(collection(db, 'volunteers'), where('chapterId', '==', user.uid));
+        const membersQ = query(collection(db, 'users'), where('chapterId', '==', userData.chapterId));
         const membersSnap = await getDocs(membersQ);
         setMembers(membersSnap.docs.map(d => ({ id: d.id, ...d.data() })));
 
         // Fetch Events
-        const eventsQ = query(collection(db, 'events'), where('chapterId', '==', user.uid));
+        const eventsQ = query(collection(db, 'events'), where('chapterId', '==', userData.chapterId));
         const eventsSnap = await getDocs(eventsQ);
         setEvents(eventsSnap.docs.map(d => ({ id: d.id, ...d.data() })));
 
@@ -55,20 +65,20 @@ const ChapterDashboard = () => {
     };
 
     fetchDashboardData();
-  }, [navigate]);
+  }, [currentUser, userData, navigate]);
 
   const handleLogout = async () => {
-    await auth.signOut();
-    navigate('/chapters');
+    await logout();
+    navigate('/');
   };
 
   const handleExportCSV = () => {
     if (members.length === 0) return;
     
-    const headers = ['First Name', 'Last Name', 'Email', 'School', 'Grade', 'Volunteer Hours'];
+    const headers = ['Name', 'Email', 'Role', 'Volunteer Hours'];
     const csvContent = [
       headers.join(','),
-      ...members.map(m => `"${m.firstName}","${m.lastName}","${m.email}","${m.school}","${m.grade}","${m.volunteerHours || 0}"`)
+      ...members.map(m => `"${m.name}","${m.email}","${m.role}","${m.volunteerHours || 0}"`)
     ].join('\\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -108,7 +118,7 @@ const ChapterDashboard = () => {
       {/* Main Content */}
       <main className="rs-dashboard__main">
         <header className="rs-dashboard__header">
-          <h2>Welcome, {chapterData?.chapterName || 'Chapter'}</h2>
+          <h2>Welcome, {chapterData?.displayName || chapterData?.chapterName || 'Chapter'}</h2>
         </header>
 
         <div className="rs-dashboard__content">
@@ -147,23 +157,21 @@ const ChapterDashboard = () => {
                     <tr>
                       <th>Name</th>
                       <th>Email</th>
-                      <th>School</th>
-                      <th>Grade</th>
+                      <th>Role</th>
                       <th>Hours</th>
                     </tr>
                   </thead>
                   <tbody>
                     {members.map(m => (
                       <tr key={m.id}>
-                        <td>{m.firstName} {m.lastName}</td>
+                        <td>{m.name || `${m.firstName || ''} ${m.lastName || ''}`}</td>
                         <td>{m.email}</td>
-                        <td>{m.school}</td>
-                        <td>{m.grade}</td>
+                        <td>{m.role || 'volunteer'}</td>
                         <td>{m.volunteerHours || 0}</td>
                       </tr>
                     ))}
                     {members.length === 0 && (
-                      <tr><td colSpan="5" style={{textAlign:'center'}}>No members found.</td></tr>
+                      <tr><td colSpan="4" style={{textAlign:'center'}}>No members found.</td></tr>
                     )}
                   </tbody>
                 </table>
@@ -197,23 +205,18 @@ const ChapterDashboard = () => {
           {activeTab === 'resources' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <h3>Resource Center</h3>
-              <div className="rs-dashboard__grid">
-                {[
-                  { title: "Chapter Handbook", type: "PDF" },
-                  { title: "Branding Guidelines", type: "PDF" },
-                  { title: "Event Planning Guide", type: "PDF" },
-                  { title: "Outreach Templates", type: "DOC" }
-                ].map((res, i) => (
-                  <div key={i} className="rs-dashboard__resource-card">
-                    <div className="icon">📄</div>
-                    <div>
-                      <h4>{res.title}</h4>
-                      <span>{res.type}</span>
-                    </div>
-                    <button className="rs-btn-outline">Download</button>
-                  </div>
-                ))}
-              </div>
+              <p>None yet. Click the button below to request specific resources from HQ.</p>
+              <a 
+                href={`mailto:recycle.specs@gmail.com?subject=${encodeURIComponent(
+                  `Resource Request - ${chapterData?.displayName || chapterData?.chapterName || ''}`
+                )}&body=${encodeURIComponent(
+                  "Hello RecycleSpecs HQ,\n\nI would like to request the following resources for our chapter:\n\n_____________________________\n\nThank you!"
+                )}`}
+                className="rs-btn-outline"
+                style={{ display: 'inline-block', marginTop: '1rem', textDecoration: 'none' }}
+              >
+                Request Resources
+              </a>
             </motion.div>
           )}
 
@@ -466,6 +469,8 @@ const ChapterDashboard = () => {
         .rs-dashboard__announcement h4 { margin: 0 0 4px 0; }
         .rs-dashboard__announcement span { font-size: 0.8rem; color: rgba(255,255,255,0.7); }
         .rs-dashboard__announcement p { margin-top: 1rem; color: rgba(255,255,255,0.9); }
+        .rs-dashboard__content a:not(.rs-btn-outline) { color: var(--rs-orange-light); text-decoration: underline; transition: color 0.2s; }
+        .rs-dashboard__content a:not(.rs-btn-outline):hover { color: var(--rs-orange); }
       `}</style>
     </div>
   );
