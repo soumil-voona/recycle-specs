@@ -4,6 +4,7 @@ import { motion, useInView } from 'motion/react';
 const teamMembers = [
   {
     profileImage: '/imgs/pfp-vidhisha.png',
+    profileImageWebp: '/imgs/pfp-vidhisha.webp',
     name: 'Vidhisha Paleti',
     title: 'Chief Executive Officer',
     mission: 'Ensuring no one struggles with vision the way she once did — leading on-ground screening drives worldwide.',
@@ -12,6 +13,7 @@ const teamMembers = [
   },
   {
     profileImage: '/imgs/pfp-soukhya.png',
+    profileImageWebp: '/imgs/pfp-soukhya.webp',
     name: 'Soukhya Voona',
     title: 'Chief Operating Officer',
     mission: 'Turning passion for medicine and community service into operational strategies that make lasting impact.',
@@ -20,6 +22,7 @@ const teamMembers = [
   },
   {
     profileImage: '/imgs/pfp-akshata.png',
+    profileImageWebp: '/imgs/pfp-akshata.webp',
     name: 'Akshata Ghosh',
     title: 'Chief Communications Officer',
     mission: 'Amplifying our message through law, policy, and international affairs to reach the communities that need it.',
@@ -28,6 +31,7 @@ const teamMembers = [
   },
   {
     profileImage: '/imgs/pfp-soumil.png',
+    profileImageWebp: '/imgs/pfp-soumil.webp',
     name: 'Soumil Voona',
     title: 'Chief Technical Officer',
     mission: 'Building the digital backbone that connects our mission to the world through technology.',
@@ -36,6 +40,7 @@ const teamMembers = [
   },
   {
     profileImage: '/imgs/pfp-sidharta.png',
+    profileImageWebp: '/imgs/pfp-sidharta.webp',
     name: 'Sidharta De',
     title: 'Chief Financial Officer',
     mission: 'Growing our financial foundation through exceptional interpersonal skills and fundraising expertise.',
@@ -44,6 +49,7 @@ const teamMembers = [
   },
   {
     profileImage: '/imgs/pfp-aditi.png',
+    profileImageWebp: '/imgs/pfp-aditi.webp',
     name: 'Aditi Ahuja',
     title: 'Chief Design Officer',
     mission: 'Channeling creativity into every visual element so our design amplifies our mission.',
@@ -69,12 +75,18 @@ const MemberCard = ({ member, index }) => {
     >
       <div className="member-card__avatar-wrap">
         {!imageError ? (
-          <img
-            src={member.profileImage}
-            alt={`${member.name}, ${member.title}`}
-            className="member-card__avatar"
-            onError={() => setImageError(true)}
-          />
+          <picture>
+            <source srcSet={member.profileImageWebp} type="image/webp" />
+            <img
+              src={member.profileImage}
+              alt={`${member.name}, ${member.title}`}
+              className="member-card__avatar"
+              loading="lazy"
+              width="120"
+              height="120"
+              onError={() => setImageError(true)}
+            />
+          </picture>
         ) : (
           <div className="member-card__avatar-fallback" style={{ background: member.color }}>
             <span>{member.initials}</span>

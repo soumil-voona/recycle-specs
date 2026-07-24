@@ -104,7 +104,10 @@ const Navbar = () => {
         <div className="rs-navbar__inner">
           {/* Logo */}
           <button className="rs-navbar__logo" onClick={handleLogoClick} aria-label="RecycleSpecs Home">
-            <img src="/imgs/logo.png" alt="RecycleSpecs logo" className="rs-navbar__logo-img" />
+            <picture>
+              <source srcSet="/imgs/logo.webp" type="image/webp" />
+              <img src="/imgs/logo.png" alt="RecycleSpecs logo" className="rs-navbar__logo-img" />
+            </picture>
             <div className="rs-navbar__logo-text">
               <span className="rs-navbar__logo-name">RecycleSpecs</span>
               <span className="rs-navbar__logo-tagline">Optical Access Initiative</span>
@@ -162,7 +165,10 @@ const Navbar = () => {
       <div className={`rs-mobile-menu ${mobileMenuOpen ? 'is-open' : ''}`} role="dialog" aria-label="Navigation menu">
         <div className="rs-mobile-menu__content">
           <div className="rs-mobile-menu__header">
-            <img src="/imgs/logo.png" alt="RecycleSpecs" style={{ height: '44px' }} />
+            <picture>
+              <source srcSet="/imgs/logo.webp" type="image/webp" />
+              <img src="/imgs/logo.png" alt="RecycleSpecs" style={{ height: '44px' }} />
+            </picture>
             <button
               className="rs-mobile-menu__close"
               onClick={() => setMobileMenuOpen(false)}

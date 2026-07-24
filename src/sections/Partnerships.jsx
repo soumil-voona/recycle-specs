@@ -6,6 +6,7 @@ const partners = [
     name: 'Sankara Eye Hospitals',
     desc: 'Conducting free eye screenings and cataract surgery scheduling at our community events.',
     logo: '/imgs/partnership_sankara-eye-care.png',
+    logoWebp: '/imgs/partnership_sankara-eye-care.webp',
     color: '#2d7d7d',
     type: 'Medical Partner',
   },
@@ -13,6 +14,7 @@ const partners = [
     name: 'Rotary Club of Guntur',
     desc: 'Community organizing and logistics support for our screening drives across India.',
     logo: '/imgs/partnership_rotary-international.png',
+    logoWebp: '/imgs/partnership_rotary-international.webp',
     color: '#c65d07',
     type: 'Community Partner',
   },
@@ -21,12 +23,14 @@ const partners = [
 const publications = [
   {
     image: "/imgs/pub_1.jpg",
+    imageWebp: "/imgs/pub_1.webp",
     title: "Rotary Club of Guntur Vikas - Guntar Vikas (Aug 2025)",
     description: "The Rotary Club of Guntur (one of our partners) has published the August 2025 article on one of the eye camps we have done in collabaration with them.",
     link: "/guntur_vikas_aug_2025.pdf"
   },
   {
     image: "/imgs/SidekickPublication.png",
+    imageWebp: "/imgs/SidekickPublication.webp",
     title: "Coppell Student Media - Seeing a Brighter Future as RecycleSpecs Brings Optical Health to Marginalized Communities (Sep 2025)",
     description: "We were published in our school newspaper for our door-to-door glasses collection and the positive community impact it created.",
     link: "https://coppellstudentmedia.com/141106/studentlife/seeing-a-brighter-future-as-recyclespecs-brings-optical-health-to-marginalized-communities/"
@@ -55,12 +59,16 @@ const PartnerCard = ({ partner, index }) => {
         animate={isInView ? { scale: 1, opacity: 1 } : {}}
         transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1], delay: index * 0.12 + 0.15 }}
       >
-        <img
-          src={partner.logo}
-          alt={`${partner.name} logo`}
-          className="partner-card__logo"
-          onError={e => { e.target.style.display = 'none'; }}
-        />
+        <picture>
+          <source srcSet={partner.logoWebp} type="image/webp" />
+          <img
+            src={partner.logo}
+            alt={`${partner.name} logo`}
+            className="partner-card__logo"
+            loading="lazy"
+            onError={e => { e.target.style.display = 'none'; }}
+          />
+        </picture>
       </motion.div>
 
       <h3 className="partner-card__name">{partner.name}</h3>
@@ -130,7 +138,15 @@ const Partnerships = () => {
                 whileHover={{ y: -6, transition: { duration: 0.3 } }}
               >
                 <div className="rs-pub-card__img-wrap">
-                  <img src={pub.image} alt={pub.title} className="rs-pub-card__img" />
+                  <picture>
+                    <source srcSet={pub.imageWebp} type="image/webp" />
+                    <img
+                      src={pub.image}
+                      alt={pub.title}
+                      className="rs-pub-card__img"
+                      loading="lazy"
+                    />
+                  </picture>
                 </div>
                 <div className="rs-pub-card__content">
                   <h4 className="rs-pub-card__title">{pub.title}</h4>

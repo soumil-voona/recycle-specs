@@ -5,6 +5,7 @@ import { motion, useInView } from 'motion/react';
 const pastEvents = [
   {
     image: '/imgs/event1.jpg',
+    imageWebp: '/imgs/event1.webp',
     title: 'Community Children Eye Screening Drive',
     subtitle: 'Guntur, India',
     date: 'July 2025',
@@ -16,6 +17,7 @@ const pastEvents = [
   },
   {
     image: '/imgs/event2.jpg',
+    imageWebp: '/imgs/event2.webp',
     title: 'Senior Citizens Eye Screening Drive',
     subtitle: 'Guntur, India',
     date: 'July 2025',
@@ -28,12 +30,12 @@ const pastEvents = [
 ];
 
 const carouselImages = [
-  '/imgs/events/pic1.jpg', '/imgs/events/pic2.jpg', '/imgs/events/pic3.jpg',
-  '/imgs/events/pic4.jpg', '/imgs/events/pic5.jpg', '/imgs/events/pic6.jpg',
-  '/imgs/events/pic7.jpg', '/imgs/events/pic8.jpg', '/imgs/events/pic9.jpg',
-  '/imgs/events/pic10.jpg', '/imgs/events/pic11.jpg', '/imgs/events/pic12.jpg',
-  '/imgs/events/pic13.jpg', '/imgs/events/pic14.jpg', '/imgs/events/pic15.jpg',
-  '/imgs/events/pic16.jpg', '/imgs/events/pic17.jpg', '/imgs/events/pic18.jpg',
+  '/imgs/events/pic1.webp', '/imgs/events/pic2.webp', '/imgs/events/pic3.webp',
+  '/imgs/events/pic4.webp', '/imgs/events/pic5.webp', '/imgs/events/pic6.webp',
+  '/imgs/events/pic7.webp', '/imgs/events/pic8.webp', '/imgs/events/pic9.webp',
+  '/imgs/events/pic10.webp', '/imgs/events/pic11.webp', '/imgs/events/pic12.webp',
+  '/imgs/events/pic13.webp', '/imgs/events/pic14.webp', '/imgs/events/pic15.webp',
+  '/imgs/events/pic16.webp', '/imgs/events/pic17.webp', '/imgs/events/pic18.webp',
 ];
 
 /* ─── Event Card ─── */
@@ -55,12 +57,18 @@ const EventCard = ({ event, index }) => {
       {/* Image */}
       <div className="event-card__img-wrap">
         {!imageError ? (
-          <img
-            src={event.image}
-            alt={event.title}
-            className="event-card__img"
-            onError={() => setImageError(true)}
-          />
+          <picture>
+            <source srcSet={event.imageWebp} type="image/webp" />
+            <img
+              src={event.image}
+              alt={event.title}
+              className="event-card__img"
+              loading="lazy"
+              width="540"
+              height="260"
+              onError={() => setImageError(true)}
+            />
+          </picture>
         ) : (
           <div className="event-card__img-placeholder">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">

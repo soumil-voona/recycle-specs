@@ -39,12 +39,24 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Recycle Specs | Youth-Led Optical Access Initiative" />
     <meta name="twitter:description" content="Recycle Specs is a youth-led non-profit dedicated to spreading optical awareness, literacy, and equity. Join us in making vision accessible for all." />
-    <!-- Style -->
-     
-    <!-- Fonts -->
+    <!-- LCP image preload — must come before fonts to hit the critical path early -->
+    <link rel="preload" as="image" href="/imgs/event1.webp" fetchpriority="high" type="image/webp">
+
+    <!-- Fonts — loaded non-render-blocking (print→all swap trick) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,400;1,9..144,700&family=Inter:wght@300;400;500;600;700;800&family=DM+Serif+Text:ital@0;1&display=swap" rel="stylesheet">  
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,400;1,9..144,700&family=Inter:wght@300;400;500;600;700;800&family=DM+Serif+Text:ital@0;1&display=swap"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,400;1,9..144,700&family=Inter:wght@300;400;500;600;700;800&family=DM+Serif+Text:ital@0;1&display=swap"
+      />
+    </noscript>
   </head>
 
   <body style="background-color: #f5f0e8; width: 100%; margin: 0; padding: 0; overflow-x: hidden;">

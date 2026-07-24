@@ -132,12 +132,20 @@ const Home = () => {
 
             <div className="rs-hero__image-wrap">
               <div className="rs-hero__frame-inner">
-                <motion.img
-                  src="/imgs/event1.jpg"
-                  alt="RecycleSpecs team conducting an eye screening drive in Guntur, India"
-                  className="rs-hero__img"
-                  style={{ y: bgY }}
-                />
+                <motion.div className="rs-hero__parallax-wrap" style={{ y: bgY }}>
+                  <picture>
+                    <source srcSet="/imgs/event1.webp" type="image/webp" />
+                    <img
+                      src="/imgs/event1.jpg"
+                      alt="RecycleSpecs team conducting an eye screening drive in Guntur, India"
+                      className="rs-hero__img"
+                      fetchpriority="high"
+                      width="540"
+                      height="405"
+                      decoding="async"
+                    />
+                  </picture>
+                </motion.div>
                 <div className="rs-hero__frame-overlay" />
               </div>
               {/* Floating badges */}
@@ -393,6 +401,12 @@ const Home = () => {
           object-fit: cover;
           transform: scale(1);
           transition: transform 8s ease;
+          display: block;
+        }
+        .rs-hero__parallax-wrap {
+          width: 100%;
+          height: 120%;
+          position: relative;
         }
         .rs-hero__frame-inner:hover .rs-hero__img {
           transform: scale(1.04);

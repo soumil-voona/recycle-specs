@@ -20,11 +20,15 @@ const StartAChapter = () => {
           whileHover={{ y: -5, scale: 1.02, transition: { duration: 0.3 } }}
           whileTap={{ scale: 0.98 }}
         >
-          <img
-            src="/imgs/start-chapter-banner.png"
-            alt="Start a RecycleSpecs Chapter"
-            className="rs-chapter__img"
-          />
+          <picture>
+            <source srcSet="/imgs/start-chapter-banner.webp" type="image/webp" />
+            <img
+              src="/imgs/start-chapter-banner.png"
+              alt="Start a RecycleSpecs Chapter"
+              className="rs-chapter__img"
+              loading="lazy"
+            />
+          </picture>
           <div className="rs-chapter__overlay">
             <span className="rs-chapter__cta">Click to Apply</span>
           </div>

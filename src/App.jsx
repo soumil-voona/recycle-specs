@@ -1,8 +1,10 @@
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, lazy, Suspense } from 'react'
 import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { motion, useInView } from 'motion/react'
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from "@vercel/speed-insights/react"
+
+// Eagerly loaded — render on the initial home route
 import Home from './sections/Home'
 import Navbar from './sections/Navbar'
 import BoardMembers from './sections/BoardMembers'
@@ -13,19 +15,21 @@ import Timeline from './sections/Timeline'
 import Partnerships from './sections/Partnerships'
 import PastEvents from './sections/PastEvents'
 import StartAChapter from './sections/StartAChapter'
-import Upcoming from './sections/Upcoming'
-import UpcomingEvent from './sections/UpcomingEvent'
-import Volunteers from './sections/Volunteers'
-import Login from './sections/Login'
-import Signup from './sections/Signup'
-import ProtectedRoute from './components/ProtectedRoute'
-import Chapters from './sections/Chapters'
-import VolunteerSignup from './sections/VolunteerSignup'
-import ChapterAdminLogin from './sections/ChapterAdminLogin'
-import UnlistedChapterSignup from './sections/UnlistedChapterSignup'
-import ChapterDashboard from './sections/ChapterDashboard'
-import HQAdminPanel from './sections/HQAdminPanel'
 import HomePopup from './components/HomePopup'
+import ProtectedRoute from './components/ProtectedRoute'
+
+// Lazy-loaded — code-split into separate chunks, only fetched when navigated to
+const Upcoming = lazy(() => import('./sections/Upcoming'));
+const UpcomingEvent = lazy(() => import('./sections/UpcomingEvent'));
+const Volunteers = lazy(() => import('./sections/Volunteers'));
+const Login = lazy(() => import('./sections/Login'));
+const Signup = lazy(() => import('./sections/Signup'));
+const Chapters = lazy(() => import('./sections/Chapters'));
+const ChapterAdminLogin = lazy(() => import('./sections/ChapterAdminLogin'));
+const ChapterDashboard = lazy(() => import('./sections/ChapterDashboard'));
+const HQAdminPanel = lazy(() => import('./sections/HQAdminPanel'));
+const UnlistedChapterSignup = lazy(() => import('./sections/UnlistedChapterSignup'));
+const VolunteerSignup = lazy(() => import('./sections/VolunteerSignup'));
 
 /* ─────────────────────────────────────
    Global scroll-reveal observer
@@ -58,10 +62,18 @@ function useGlobalReveal() {
     observeAll();
 
     // Re-scan when new nodes appear (route changes, lazy renders)
-    const mo = new MutationObserver(observeAll);
+    // Use a debounce to avoid calling observeAll on every single child mutation
+    let rafId = null;
+    const mo = new MutationObserver(() => {
+      if (rafId) return;
+      rafId = requestAnimationFrame(() => {
+        observeAll();
+        rafId = null;
+      });
+    });
     mo.observe(document.body, { childList: true, subtree: true });
 
-    return () => { io.disconnect(); mo.disconnect(); };
+    return () => { io.disconnect(); mo.disconnect(); if (rafId) cancelAnimationFrame(rafId); };
   }, []);
 }
 
@@ -360,7 +372,10 @@ const Footer = () => (
   <footer className="rs-footer">
     <div className="rs-footer__inner">
       <div className="rs-footer__brand">
-        <img src="/imgs/logo.png" alt="RecycleSpecs" className="rs-footer__logo" />
+        <picture>
+          <source srcSet="/imgs/logo.webp" type="image/webp" />
+          <img src="/imgs/logo.png" alt="RecycleSpecs" className="rs-footer__logo" />
+        </picture>
         <div>
           <div className="rs-footer__name">RecycleSpecs</div>
           <div className="rs-footer__tagline">Youth-Led Optical Access Initiative</div>
@@ -489,8 +504,9 @@ const HomePage = () => {
       }
       const element = document.getElementById(targetId);
       if (!element) return;
+      // Read offsetHeight once, outside of any scroll handler, to avoid forced reflow
       const navbar = document.querySelector('.rs-navbar');
-      const navbarHeight = navbar ? navbar.offsetHeight + 12 : 80;
+      const navbarHeight = navbar ? navbar.getBoundingClientRect().height + 12 : 80;
       const offsetPosition = element.getBoundingClientRect().top + window.scrollY - navbarHeight;
       window.scrollTo({ top: Math.max(offsetPosition, 0), behavior: 'smooth' });
       navigate(location.pathname, { replace: true, state: null });
@@ -527,36 +543,43 @@ function App() {
   return (
     <>
       <Navbar />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/upcoming" element={<Upcoming />} />
-        <Route path="/upcoming/:eventPath" element={<UpcomingEvent />} />
-        <Route
-          path="/volunteers"
-          element={
-            <ProtectedRoute message="Log in to access the volunteer dashboard." redirectTo="/login">
-              <Volunteers />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/chapters" element={<Chapters />} />
-        <Route path="/chapters/signup" element={<Signup />} />
-        <Route path="/chapters/admin-login" element={<ChapterAdminLogin />} />
-        <Route path="/chapters/dashboard" element={
-            <ProtectedRoute message="Log in to access the chapter dashboard." redirectTo="/login" requireChapterLead={true}>
-              <ChapterDashboard />
-            </ProtectedRoute>
-        } />
-        <Route path="/unlisted-chapter-signup" element={<UnlistedChapterSignup />} />
-        <Route path="/hq-admin" element={
-            <ProtectedRoute message="Log in to access the admin panel." redirectTo="/login" requireFoundingMember={true}>
-              <HQAdminPanel />
-            </ProtectedRoute>
-        } />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <Suspense fallback={
+        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-cream)' }}>
+          <div style={{ width: 40, height: 40, border: '3px solid rgba(198,93,7,0.2)', borderTopColor: 'var(--rs-orange, #c65d07)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        </div>
+      }>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/upcoming" element={<Upcoming />} />
+          <Route path="/upcoming/:eventPath" element={<UpcomingEvent />} />
+          <Route
+            path="/volunteers"
+            element={
+              <ProtectedRoute message="Log in to access the volunteer dashboard." redirectTo="/login">
+                <Volunteers />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/chapters" element={<Chapters />} />
+          <Route path="/chapters/signup" element={<Signup />} />
+          <Route path="/chapters/admin-login" element={<ChapterAdminLogin />} />
+          <Route path="/chapters/dashboard" element={
+              <ProtectedRoute message="Log in to access the chapter dashboard." redirectTo="/login" requireChapterLead={true}>
+                <ChapterDashboard />
+              </ProtectedRoute>
+          } />
+          <Route path="/unlisted-chapter-signup" element={<UnlistedChapterSignup />} />
+          <Route path="/hq-admin" element={
+              <ProtectedRoute message="Log in to access the admin panel." redirectTo="/login" requireFoundingMember={true}>
+                <HQAdminPanel />
+              </ProtectedRoute>
+          } />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
       <Analytics />
       <SpeedInsights />
     </>
