@@ -27,6 +27,18 @@ const pastEvents = [
     color: '#c65d07',
     tag: 'Senior Care',
   },
+  {
+    image: '/imgs/event-3.jpg',
+    imageWebp: '/imgs/event-3.webp',
+    title: 'FREE MEGA EYE CHECKING CAMP',
+    subtitle: 'Thulluru Mandal, A.P., INDIA',
+    date: 'August 2026',
+    location: 'Sri Srinivasa Kalyanamandapam, Pedaparimi, Thulluru Mandal, A.P., INDIA.',
+    description: 'We hosted a Free Mega Eye Checking Camp for senior citizens, providing essential eye care to the community. Through this initiative, we were able to screen 120 individuals and identified 42 patients (35%) who needed further cataract surgery.',
+    impact: '120 seniors screened · 42 cataract surgeries scheduled',
+    color: '#2d5a7d',
+    tag: 'Senior Care',
+  },
 ];
 
 const carouselImages = [
@@ -36,6 +48,11 @@ const carouselImages = [
   '/imgs/events/pic10.webp', '/imgs/events/pic11.webp', '/imgs/events/pic12.webp',
   '/imgs/events/pic13.webp', '/imgs/events/pic14.webp', '/imgs/events/pic15.webp',
   '/imgs/events/pic16.webp', '/imgs/events/pic17.webp', '/imgs/events/pic18.webp',
+  '/imgs/events/pic19.webp', '/imgs/events/pic20.webp', '/imgs/events/pic21.webp',
+  '/imgs/events/pic22.webp', '/imgs/events/pic23.webp', '/imgs/events/pic24.webp',
+  '/imgs/events/pic25.webp', '/imgs/events/pic26.webp', '/imgs/events/pic27.webp',
+  '/imgs/events/pic28.webp', '/imgs/events/pic29.webp', '/imgs/events/pic30.webp',
+  '/imgs/events/pic31.webp', '/imgs/events/pic32.webp',
 ];
 
 /* ─── Event Card ─── */

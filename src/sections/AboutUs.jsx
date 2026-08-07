@@ -6,7 +6,7 @@ import { Dialog, DialogContent, IconButton } from '@mui/material';
 const impactData = [
   {
     id: 'screened',
-    value: '595',
+    value: '715',
     suffix: '+',
     label: 'People Screened',
     accent: 'var(--rs-teal)',
@@ -20,6 +20,7 @@ const impactData = [
     breakdown: [
       'Community Children Eye Screening Drive in Guntur, India — 385 children',
       'Community Senior Citizens Eye Screening Drive in Guntur, India — 210 seniors',
+      'Mega Eye Checking Camp in Thulluru Mandal, India — 120 seniors',
     ],
   },
   {
@@ -42,7 +43,7 @@ const impactData = [
   },
   {
     id: 'funds',
-    value: '$200',
+    value: '$500',
     suffix: '',
     label: 'Funds Raised',
     accent: 'var(--rs-gold)',
@@ -53,12 +54,12 @@ const impactData = [
     ),
     summary: 'Funds raised to support outreach, screenings, and related mission costs.',
     breakdown: [
-      'Door-to-door community fundraising: $200 USD',
+      'Door-to-door community fundraising: $500 USD',
     ],
   },
   {
     id: 'communities',
-    value: '3',
+    value: '4',
     suffix: '',
     label: 'Communities Served',
     accent: 'var(--rs-teal)',
@@ -73,6 +74,7 @@ const impactData = [
       'Coppell, Texas — Glasses collection drives',
       'Guntur, India — Children eye screening',
       'Guntur, India — Senior citizens screening',
+      'Thulluru Mandal, India — Mega Eye Checking Camp',
     ],
   },
 ];

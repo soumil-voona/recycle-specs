@@ -90,7 +90,7 @@ const Home = () => {
             transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.45 }}
           >
             <motion.a
-              href="mailto:recycle.specs@gmail.com"
+              href="mailto:recycle.specs@gmail.com?subject=Donating%20Glasses&body=Hi%20RecycleSpecs%20Team,%0D%0A%0D%0AI%20would%20like%20to%20donate%20glasses.%20Please%20let%20me%20know%20how%20I%20can%20proceed.%0D%0A%0D%0AThanks,%0D%0A[Your Name]"
               className="btn btn-primary rs-hero__cta-primary"
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.97 }}
@@ -101,7 +101,7 @@ const Home = () => {
               </svg>
             </motion.a>
             <motion.a
-              href="/volunteer-login"
+              href="/volunteer-signup"
               className="btn btn-secondary rs-hero__cta-secondary"
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.97 }}
@@ -160,7 +160,7 @@ const Home = () => {
                   <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
                 <div>
-                  <div className="badge-num">595+</div>
+                  <div className="badge-num">715+</div>
                   <div className="badge-label">People Served</div>
                 </div>
               </motion.div>

@@ -153,9 +153,9 @@ const VolunteerSignup = () => {
             </button>
           </form>
 
-          <div className="rs-v-signup__footer">
-            Already have an account? <button onClick={() => navigate('/volunteer-login')} className="rs-v-signup__login-link">Log In</button>
-          </div>
+          <p className="rs-v-signup__login-text">
+            Already have an account? <button onClick={() => navigate('/login')} className="rs-v-signup__login-link">Log In</button>
+          </p>
         </motion.div>
       </div>
 
@@ -239,6 +239,8 @@ const VolunteerSignup = () => {
 
         .rs-v-signup__field input,
         .rs-v-signup__field select {
+          width: 100%;
+          box-sizing: border-box;
           background: rgba(0,0,0,0.2);
           border: 1px solid rgba(255,255,255,0.1);
           border-radius: 8px;

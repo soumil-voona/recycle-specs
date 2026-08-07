@@ -572,6 +572,7 @@ function App() {
               </ProtectedRoute>
           } />
           <Route path="/unlisted-chapter-signup" element={<UnlistedChapterSignup />} />
+          <Route path="/volunteer-signup" element={<VolunteerSignup />} />
           <Route path="/hq-admin" element={
               <ProtectedRoute message="Log in to access the admin panel." redirectTo="/login" requireFoundingMember={true}>
                 <HQAdminPanel />

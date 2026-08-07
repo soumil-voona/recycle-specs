@@ -34,13 +34,14 @@ const milestones = [
     color: 'var(--rs-gold)',
     location: 'Guntur, India',
   },
+
   {
-    year: '2025',
-    title: '$200 Fundraised',
-    desc: 'Door-to-door community fundraising generates crucial funds to support upcoming outreach and screenings.',
-    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>,
-    color: 'var(--rs-orange)',
-    location: 'Texas, USA',
+    year: '2026',
+    title: 'Mega Eye Checking Camp',
+    desc: '120 senior citizens screened at Sri Srinivasa Kalyanamandapam. 42 patients identified for cataract surgery.',
+    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22v-4"/><path d="M12 18H8"/><path d="M12 18h4"/><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/><path d="M12 12v4"/><path d="M10 14h4"/></svg>,
+    color: 'var(--rs-gold)',
+    location: 'Thulluru Mandal, India',
   },
   {
     year: 'Future',

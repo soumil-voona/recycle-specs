@@ -37,8 +37,8 @@ const Navbar = () => {
 
   const baseNavItems = [
     { name: 'Our Story',   targetId: 'about' },
-    { name: 'Team',        targetId: 'board' },
     { name: 'Impact',      targetId: 'events' },
+    { name: 'Team',        targetId: 'board' },
     { name: 'Partners',    targetId: 'partnerships' },
     { name: 'Journey',     targetId: 'timeline' },
     { name: 'Upcoming',    route: '/upcoming' },
