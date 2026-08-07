@@ -139,38 +139,47 @@ export default function HomePopup() {
           </div>
 
           <p className="rs-content-desc">
-            Make a lasting impact in your school or local community. Help us host donation drives, raise awareness, and bring optical care to those who need it most.
+            Bring RecycleSpecs to your community. As a chapter lead, you'll organize glasses drives, run local fundraisers, and directly help us bring clear vision to communities around the world.
           </p>
 
           {/* Benefits Grid/List */}
           <div className="rs-benefits-list">
             <div className="rs-benefit-item">
               <div className="rs-benefit-icon-wrapper">
-                🎓
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
               </div>
               <div className="rs-benefit-text">
-                <strong>Leadership Experience</strong>
-                <p>Add real-world community organizing and leadership to your student profile.</p>
+                <strong>Build Leadership Skills</strong>
+                <p>Gain hands-on experience running a team, coordinating events, and making a tangible difference.</p>
               </div>
             </div>
 
             <div className="rs-benefit-item">
               <div className="rs-benefit-icon-wrapper">
-                ⏰
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
               </div>
               <div className="rs-benefit-text">
-                <strong>Volunteer Hours</strong>
-                <p>Earn verified community service hours for your school or clubs.</p>
+                <strong>Earn Volunteer Hours</strong>
+                <p>Log all the time you spend organizing your chapter for school requirements or college applications.</p>
               </div>
             </div>
 
             <div className="rs-benefit-item">
               <div className="rs-benefit-icon-wrapper">
-                📦
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                  <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                  <line x1="12" y1="22.08" x2="12" y2="12"/>
+                </svg>
               </div>
               <div className="rs-benefit-text">
-                <strong>Starter Toolkit Provided</strong>
-                <p>Get a complete kit with instructions, flyers, and boxes to kickstart your chapter.</p>
+                <strong>Everything You Need</strong>
+                <p>We'll ship you a welcome package with collection boxes, flyers, and a step-by-step guide to get started.</p>
               </div>
             </div>
           </div>
